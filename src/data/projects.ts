@@ -1,0 +1,164 @@
+export interface Project {
+    id: string;
+    title: string;
+    titlePt: string;
+    description: string;
+    descriptionPt: string;
+    category: string;
+    image: string;
+}
+
+export const projects: Project[] = [
+    // Animation
+    {
+        id: 'c6-bank',
+        title: 'C6 Bank',
+        titlePt: 'C6 Bank',
+        description: 'Animation',
+        descriptionPt: 'Animação',
+        category: 'animation',
+        image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'neon-life',
+        title: 'Neon Life',
+        titlePt: 'Vida Neon',
+        description: 'Animation',
+        descriptionPt: 'Animação',
+        category: 'animation',
+        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'cyber-punk',
+        title: 'Cyber Punk',
+        titlePt: 'Cyber Punk',
+        description: 'Animation',
+        descriptionPt: 'Animação',
+        category: 'animation',
+        image: 'https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'future-tech',
+        title: 'Future Tech',
+        titlePt: 'Tech Futuro',
+        description: 'Animation',
+        descriptionPt: 'Animação',
+        category: 'animation',
+        image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=500&fit=crop',
+    },
+
+    // Mixed Media
+    {
+        id: 'sorte-online',
+        title: 'Sorte Online',
+        titlePt: 'Sorte Online',
+        description: 'Mixed Media',
+        descriptionPt: 'Mídia Mista',
+        category: 'mixed',
+        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'collage-art',
+        title: 'Collage Art',
+        titlePt: 'Arte Colagem',
+        description: 'Mixed Media',
+        descriptionPt: 'Mídia Mista',
+        category: 'mixed',
+        image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'abstract-flow',
+        title: 'Abstract Flow',
+        titlePt: 'Fluxo Abstrato',
+        description: 'Mixed Media',
+        descriptionPt: 'Mídia Mista',
+        category: 'mixed',
+        image: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'urban-style',
+        title: 'Urban Style',
+        titlePt: 'Estilo Urbano',
+        description: 'Mixed Media',
+        descriptionPt: 'Mídia Mista',
+        category: 'mixed',
+        image: 'https://images.unsplash.com/photo-1544531586-fde5298cdd40?w=400&h=500&fit=crop',
+    },
+
+    // Social Ads
+    {
+        id: 'social-campaign',
+        title: 'Social Campaign',
+        titlePt: 'Campanha Social',
+        description: 'Social Ads',
+        descriptionPt: 'Ads Sociais',
+        category: 'social',
+        image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'instagram-stories',
+        title: 'Instagram Stories',
+        titlePt: 'Stories Instagram',
+        description: 'Social Ads',
+        descriptionPt: 'Ads Sociais',
+        category: 'social',
+        image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'tiktok-trends',
+        title: 'Tik Tok Trends',
+        titlePt: 'Tendências Tik Tok',
+        description: 'Social Ads',
+        descriptionPt: 'Ads Sociais',
+        category: 'social',
+        image: 'https://images.unsplash.com/photo-1596550190729-1d92800d3d7d?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'viral-content',
+        title: 'Viral Content',
+        titlePt: 'Conteúdo Viral',
+        description: 'Social Ads',
+        descriptionPt: 'Ads Sociais',
+        category: 'social',
+        image: 'https://images.unsplash.com/photo-1626544827763-d516dce335ca?w=400&h=500&fit=crop',
+    },
+
+
+    // Video Cases
+    {
+        id: 'agencia-duuna',
+        title: 'Agência Duuna',
+        titlePt: 'Agência Duuna',
+        description: 'Video Case',
+        descriptionPt: 'Case de Vídeo',
+        category: 'video',
+        image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'corporate-reel',
+        title: 'Corporate Reel',
+        titlePt: 'Reel Corporativo',
+        description: 'Video Case',
+        descriptionPt: 'Case de Vídeo',
+        category: 'video',
+        image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'music-video',
+        title: 'Music Video',
+        titlePt: 'Videoclipe',
+        description: 'Video Case',
+        descriptionPt: 'Case de Vídeo',
+        category: 'video',
+        image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'documentary',
+        title: 'Documentary',
+        titlePt: 'Documentário',
+        description: 'Video Case',
+        descriptionPt: 'Case de Vídeo',
+        category: 'video',
+        image: 'https://images.unsplash.com/photo-1524312895240-62287c800539?w=400&h=500&fit=crop',
+    },
+];

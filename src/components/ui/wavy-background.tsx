@@ -34,6 +34,10 @@ export const WavyBackground = ({
         ctx: any,
         canvas: any;
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isVisibleRef = useRef(true);
+    const animationIdRef = useRef<number>(0);
+
     const getSpeed = () => {
         switch (speed) {
             case "slow":
@@ -47,21 +51,24 @@ export const WavyBackground = ({
 
     const init = () => {
         canvas = canvasRef.current;
-        if (!canvas) return; // Add check for safety
+        if (!canvas) return;
         ctx = canvas.getContext("2d");
         w = ctx.canvas.width = window.innerWidth;
         h = ctx.canvas.height = window.innerHeight;
         ctx.filter = `blur(${blur}px)`;
         nt = 0;
 
-        // Use resize observer or better resize handling if possible, but window.onresize is simple for now
-        window.onresize = function () {
+        const handleResize = () => {
             if (!canvas) return;
             w = ctx.canvas.width = window.innerWidth;
             h = ctx.canvas.height = window.innerHeight;
             ctx.filter = `blur(${blur}px)`;
         };
+
+        window.addEventListener('resize', handleResize);
         render();
+
+        return () => window.removeEventListener('resize', handleResize);
     };
 
     const waveColors = colors ?? [
@@ -71,6 +78,7 @@ export const WavyBackground = ({
         "#e879f9",
         "#22d3ee",
     ];
+
     const drawWave = (n: number) => {
         nt += getSpeed();
         for (i = 0; i < n; i++) {
@@ -80,35 +88,51 @@ export const WavyBackground = ({
             ctx.strokeStyle = waveColors[i % waveColors.length];
             for (x = 0; x < w; x += 5) {
                 var y = noise(x / 800, 0.3 * i, nt) * 100;
-                ctx.lineTo(x, y + h * 0.5); // adjust for height, currently at 50% of the container
+                ctx.lineTo(x, y + h * 0.5);
             }
             ctx.stroke();
             ctx.closePath();
         }
     };
 
-    let animationId: number;
     const render = () => {
-        if (!ctx) return;
+        if (!ctx || !isVisibleRef.current) return;
         ctx.fillStyle = backgroundFill || "black";
         ctx.globalAlpha = waveOpacity || 0.5;
         ctx.fillRect(0, 0, w, h);
         drawWave(5);
-        animationId = requestAnimationFrame(render);
+        animationIdRef.current = requestAnimationFrame(render);
     };
 
+    // IntersectionObserver to pause animation when not visible
     useEffect(() => {
-        init();
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                isVisibleRef.current = entry.isIntersecting;
+                if (entry.isIntersecting && !animationIdRef.current) {
+                    render();
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (containerRef.current) {
+            observer.observe(containerRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        const cleanup = init();
         return () => {
-            cancelAnimationFrame(animationId);
-            // Clean up resize listener if we attached to window.onresize roughly
-            window.onresize = null;
+            cancelAnimationFrame(animationIdRef.current);
+            cleanup?.();
         };
     }, []);
 
     const [isSafari, setIsSafari] = useState(false);
     useEffect(() => {
-        // I'm sorry but i have got to support it on safari.
         setIsSafari(
             typeof window !== "undefined" &&
             navigator.userAgent.includes("Safari") &&
@@ -118,6 +142,7 @@ export const WavyBackground = ({
 
     return (
         <div
+            ref={containerRef}
             className={cn(
                 "h-screen flex flex-col items-center justify-center",
                 containerClassName

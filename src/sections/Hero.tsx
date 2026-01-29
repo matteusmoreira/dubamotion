@@ -44,32 +44,27 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     >
       {/* Octopus Corner Shapes - appear during transition */}
       <div
-        className={`octopus-corner octopus-corner-tl transition-all duration-1000 ${
-          phase === 'full' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
-        }`}
+        className={`octopus-corner octopus-corner-tl transition-all duration-1000 ${phase === 'full' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+          }`}
       />
       <div
-        className={`octopus-corner octopus-corner-tr transition-all duration-1000 delay-200 ${
-          phase === 'full' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
-        }`}
+        className={`octopus-corner octopus-corner-tr transition-all duration-1000 delay-200 ${phase === 'full' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+          }`}
       />
       <div
-        className={`octopus-corner octopus-corner-bl transition-all duration-1000 delay-300 ${
-          phase === 'full' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
-        }`}
+        className={`octopus-corner octopus-corner-bl transition-all duration-1000 delay-300 ${phase === 'full' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+          }`}
       />
       <div
-        className={`octopus-corner octopus-corner-br transition-all duration-1000 delay-400 ${
-          phase === 'full' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
-        }`}
+        className={`octopus-corner octopus-corner-br transition-all duration-1000 delay-400 ${phase === 'full' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+          }`}
       />
 
       {/* Purple Wave Background Effect */}
       <div className="absolute inset-0 overflow-hidden">
         <div
-          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] transition-all duration-1500 ${
-            phase === 'full' ? 'opacity-60' : 'opacity-0'
-          }`}
+          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] transition-all duration-1500 ${phase === 'full' ? 'opacity-60' : 'opacity-0'
+            }`}
           style={{
             background: `
               radial-gradient(ellipse at 20% 30%, rgba(107, 33, 168, 0.4) 0%, transparent 40%),
@@ -85,14 +80,15 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-8">
         {/* Octopus Image - Appears during transition */}
         <div
-          className={`absolute inset-0 flex items-center justify-center transition-all duration-1500 ${
-            phase === 'full' ? 'opacity-100 scale-100' : phase === 'transition' ? 'opacity-50 scale-95' : 'opacity-0 scale-90'
-          }`}
+          className={`absolute inset-0 flex items-center justify-center transition-all duration-1500 ${phase === 'full' ? 'opacity-100 scale-100' : phase === 'transition' ? 'opacity-50 scale-95' : 'opacity-0 scale-90'
+            }`}
           style={{ zIndex: 10 }}
         >
           <img
-            src="/images/octopus.png"
+            src="/images/octopus.webp"
             alt="3D Octopus"
+            loading="eager"
+            fetchPriority="high"
             className="max-w-full max-h-[80vh] object-contain float-animation"
             style={{
               filter: 'drop-shadow(0 0 60px rgba(107, 33, 168, 0.5))',
@@ -110,7 +106,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
           }}
         >
           {/* Solid black background for logo */}
-          <div 
+          <div
             className="relative flex items-center justify-center"
             style={{
               width: '400px',
@@ -133,8 +129,8 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
                 alt="Dubamotion"
                 className="h-48 lg:h-64 w-auto object-contain"
                 style={{
-                  filter: phase === 'logo' 
-                    ? 'none' 
+                  filter: phase === 'logo'
+                    ? 'none'
                     : 'drop-shadow(0 0 80px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 120px rgba(107, 33, 168, 1))',
                 }}
               />
@@ -144,11 +140,10 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
 
         {/* Motion Design Text - appears after logo */}
         <div
-          className={`absolute left-8 lg:left-16 top-1/2 transform -translate-y-1/2 transition-all duration-1000 ${
-            phase === 'full'
+          className={`absolute left-8 lg:left-16 top-1/2 transform -translate-y-1/2 transition-all duration-1000 ${phase === 'full'
               ? 'opacity-100 translate-x-0'
               : 'opacity-0 -translate-x-10'
-          }`}
+            }`}
           style={{ zIndex: 40 }}
         >
           <h1 className="text-3xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
@@ -162,11 +157,10 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
 
         {/* Deepening Ideas Text */}
         <div
-          className={`absolute right-8 lg:right-16 top-1/2 transform -translate-y-1/2 transition-all duration-1000 delay-300 ${
-            phase === 'full'
+          className={`absolute right-8 lg:right-16 top-1/2 transform -translate-y-1/2 transition-all duration-1000 delay-300 ${phase === 'full'
               ? 'opacity-100 translate-x-0'
               : 'opacity-0 translate-x-10'
-          }`}
+            }`}
           style={{ zIndex: 40 }}
         >
           <h2 className="text-2xl lg:text-4xl font-bold text-white leading-tight text-right drop-shadow-lg">
@@ -178,9 +172,8 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
 
         {/* Bottom Left - Dubamotion Text */}
         <div
-          className={`absolute bottom-12 left-8 lg:left-16 transition-all duration-1000 delay-500 ${
-            phase !== 'logo' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-          }`}
+          className={`absolute bottom-12 left-8 lg:left-16 transition-all duration-1000 delay-500 ${phase !== 'logo' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+            }`}
           style={{ zIndex: 40 }}
         >
           <span className="neon-text text-lg tracking-widest font-medium">
@@ -190,9 +183,8 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
 
         {/* Bottom Right - Showreel Link */}
         <div
-          className={`absolute bottom-12 right-8 lg:right-16 transition-all duration-1000 delay-600 ${
-            phase !== 'logo' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-          }`}
+          className={`absolute bottom-12 right-8 lg:right-16 transition-all duration-1000 delay-600 ${phase !== 'logo' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+            }`}
           style={{ zIndex: 40 }}
         >
           <button
@@ -205,9 +197,8 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
 
         {/* Scroll Indicator */}
         <div
-          className={`absolute bottom-12 left-1/2 transform -translate-x-1/2 transition-all duration-1000 delay-700 ${
-            phase !== 'logo' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-          }`}
+          className={`absolute bottom-12 left-1/2 transform -translate-x-1/2 transition-all duration-1000 delay-700 ${phase !== 'logo' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+            }`}
           style={{ zIndex: 40 }}
         >
           <button

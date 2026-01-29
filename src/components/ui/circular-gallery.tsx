@@ -32,9 +32,25 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
     ({ items, className, radius = 600, autoRotateSpeed = 0.02, ...props }, ref) => {
         const [rotation, setRotation] = useState(0);
         const [isScrolling, setIsScrolling] = useState(false);
+        const [isVisible, setIsVisible] = useState(false);
         const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
         const animationFrameRef = useRef<number | null>(null);
+        const containerRef = useRef<HTMLDivElement>(null);
         const navigate = useNavigate();
+
+        // IntersectionObserver to pause animation when not visible
+        useEffect(() => {
+            const observer = new IntersectionObserver(
+                ([entry]) => setIsVisible(entry.isIntersecting),
+                { threshold: 0.1 }
+            );
+
+            if (containerRef.current) {
+                observer.observe(containerRef.current);
+            }
+
+            return () => observer.disconnect();
+        }, []);
 
         // Effect to handle scroll-based rotation
         useEffect(() => {
@@ -63,8 +79,10 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
             };
         }, []);
 
-        // Effect for auto-rotation when not scrolling
+        // Effect for auto-rotation when not scrolling AND visible
         useEffect(() => {
+            if (!isVisible) return;
+
             const autoRotate = () => {
                 if (!isScrolling) {
                     setRotation(prev => prev + autoRotateSpeed);
@@ -79,7 +97,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                     cancelAnimationFrame(animationFrameRef.current);
                 }
             };
-        }, [isScrolling, autoRotateSpeed]);
+        }, [isScrolling, isVisible, autoRotateSpeed]);
 
         const anglePerItem = 360 / items.length;
 
@@ -91,7 +109,12 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
 
         return (
             <div
-                ref={ref}
+                ref={(node) => {
+                    // Combine forwardRef with containerRef
+                    containerRef.current = node;
+                    if (typeof ref === 'function') ref(node);
+                    else if (ref) ref.current = node;
+                }}
                 role="region"
                 aria-label="Circular 3D Gallery"
                 className={cn("relative w-full h-full flex items-center justify-center", className)}

@@ -46,6 +46,24 @@ export const projects: Project[] = [
         category: 'animation',
         image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=500&fit=crop',
     },
+    {
+        id: 'cyber-warrior',
+        title: 'Cyber Warrior',
+        titlePt: 'Cyber Guerreiro',
+        description: 'Animation',
+        descriptionPt: 'Animação',
+        category: 'animation',
+        image: 'https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'neon-city',
+        title: 'Neon City',
+        titlePt: 'Cidade Neon',
+        description: 'Animation',
+        descriptionPt: 'Animação',
+        category: 'animation',
+        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=500&fit=crop',
+    },
 
     // Mixed Media
     {
@@ -83,6 +101,24 @@ export const projects: Project[] = [
         descriptionPt: 'Mídia Mista',
         category: 'mixed',
         image: 'https://images.unsplash.com/photo-1544531586-fde5298cdd40?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'retro-collage',
+        title: 'Retro Collage',
+        titlePt: 'Colagem Retro',
+        description: 'Mixed Media',
+        descriptionPt: 'Mídia Mista',
+        category: 'mixed',
+        image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'digital-art',
+        title: 'Digital Art',
+        titlePt: 'Arte Digital',
+        description: 'Mixed Media',
+        descriptionPt: 'Mídia Mista',
+        category: 'mixed',
+        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=500&fit=crop',
     },
 
     // Social Ads
@@ -122,6 +158,24 @@ export const projects: Project[] = [
         category: 'social',
         image: 'https://images.unsplash.com/photo-1626544827763-d516dce335ca?w=400&h=500&fit=crop',
     },
+    {
+        id: 'tiktok-dance',
+        title: 'Tik Tok Dance',
+        titlePt: 'Dança Tik Tok',
+        description: 'Social Ads',
+        descriptionPt: 'Ads Sociais',
+        category: 'social',
+        image: 'https://images.unsplash.com/photo-1596550190729-1d92800d3d7d?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'insta-stories-2',
+        title: 'Insta Stories 2',
+        titlePt: 'Stories Instagram 2',
+        description: 'Social Ads',
+        descriptionPt: 'Ads Sociais',
+        category: 'social',
+        image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=500&fit=crop',
+    },
 
 
     // Video Cases
@@ -160,5 +214,23 @@ export const projects: Project[] = [
         descriptionPt: 'Case de Vídeo',
         category: 'video',
         image: 'https://images.unsplash.com/photo-1524312895240-62287c800539?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'music-clip',
+        title: 'Music Clip',
+        titlePt: 'Clipe Musical',
+        description: 'Video Case',
+        descriptionPt: 'Case de Vídeo',
+        category: 'video',
+        image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=400&h=500&fit=crop',
+    },
+    {
+        id: 'brand-film',
+        title: 'Brand Film',
+        titlePt: 'Filme de Marca',
+        description: 'Video Case',
+        descriptionPt: 'Case de Vídeo',
+        category: 'video',
+        image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=500&fit=crop',
     },
 ];

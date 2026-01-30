@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Stories,
   StoriesContent,
   Story,
   StoryAuthor,
-  StoryAuthorImage,
   StoryAuthorName,
   StoryOverlay,
   StoryImage,
@@ -74,6 +74,12 @@ const Projects = () => {
     setCurrentCategory((prev) => (prev - 1 + categories.length) % categories.length);
   };
 
+  const navigate = useNavigate();
+
+  const handleProjectClick = (projectId: string) => {
+    navigate(`/project/${projectId}`);
+  };
+
   const currentCat = categories[currentCategory];
   const filteredProjects = projects.filter((p) => p.category === currentCat.id);
 
@@ -118,15 +124,15 @@ const Projects = () => {
             <Stories>
               <StoriesContent>
                 {filteredProjects.map((project) => (
-                  <Story className="aspect-[3/4] w-[200px]" key={project.id}>
+                  <Story
+                    className="aspect-[3/4] w-[280px]"
+                    key={project.id}
+                    onClick={() => handleProjectClick(project.id)}
+                  >
                     <StoryImage src={project.image} alt={project.title} />
                     <StoryOverlay />
                     <StoryAuthor>
-                      <StoryAuthorImage
-                        fallback={project.title.charAt(0)}
-                        name={project.title}
-                      />
-                      <StoryAuthorName>{project.title}</StoryAuthorName>
+                      <StoryAuthorName className="text-xl font-bold">{project.title}</StoryAuthorName>
                     </StoryAuthor>
                   </Story>
                 ))}

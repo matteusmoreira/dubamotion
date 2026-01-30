@@ -46,12 +46,12 @@ export const StoriesContent = ({
 export type StoryProps = HTMLAttributes<HTMLDivElement>;
 
 export const Story = ({ className, ...props }: StoryProps) => (
-    <CarouselItem className={cn('basis-auto !w-[200px] pl-2 md:pl-4', className)}>
+    <CarouselItem className={cn('basis-auto pl-2 md:pl-4', className)}>
         <div
             className={cn(
-                'group relative overflow-hidden rounded-xl bg-muted/40',
-                'cursor-pointer transition-all duration-200',
-                'hover:scale-[1.02] hover:shadow-lg',
+                'group relative overflow-hidden rounded-3xl bg-muted/40',
+                'cursor-pointer transition-all duration-300 ease-in-out',
+                'hover:scale-110 hover:shadow-2xl hover:z-50',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                 className
             )}
@@ -223,7 +223,7 @@ export const StoryOverlay = ({
     return (
         <div
             className={cn(
-                'absolute right-0 left-0 h-10 from-black/20 to-transparent',
+                'absolute right-0 left-0 h-24 from-black/80 via-black/40 to-transparent',
                 positionClasses,
                 className
             )}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
 interface HeroProps {
   onShowreelClick?: () => void;
@@ -79,22 +80,30 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
       {/* Main Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-8">
         {/* Octopus Image - Appears during transition */}
-        <div
-          className={`absolute inset-0 flex items-center justify-center transition-all duration-1500 ${phase === 'full' ? 'opacity-100 scale-100' : phase === 'transition' ? 'opacity-50 scale-95' : 'opacity-0 scale-90'
-            }`}
+        {/* Octopus Image - Appears during transition */}
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center transform-gpu"
           style={{ zIndex: 10 }}
+          initial={{ opacity: 0, scale: 0.8, y: 100 }}
+          animate={phase !== 'logo' ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 100 }}
+          transition={{
+            duration: 1.5,
+            type: "spring",
+            bounce: 0.4,
+            ease: "easeOut"
+          }}
         >
           <img
-            src="/images/octopus.webp"
+            src="/octopus-purple.png"
             alt="3D Octopus"
             loading="eager"
             fetchPriority="high"
-            className="max-w-full max-h-[80vh] object-contain float-animation"
+            className="max-w-full max-h-[85vh] object-contain float-animation"
             style={{
               filter: 'drop-shadow(0 0 60px rgba(107, 33, 168, 0.5))',
             }}
           />
-        </div>
+        </motion.div>
 
         {/* Large Logo - Starts big, shrinks on scroll */}
         <div

@@ -72,9 +72,9 @@ const OctopusMesh = ({ imagePath }: { imagePath: string }) => {
         const targetX = mouseX * 4.0;
         const targetY = mouseY * 3.0;
 
-        // Smooth interpolation (more responsive)
-        smoothPos.current.x += (targetX - smoothPos.current.x) * 0.04;
-        smoothPos.current.y += (targetY - smoothPos.current.y) * 0.04;
+        // Smooth interpolation (slower for smoother movement)
+        smoothPos.current.x += (targetX - smoothPos.current.x) * 0.025;
+        smoothPos.current.y += (targetY - smoothPos.current.y) * 0.025;
 
         // Apply position directly
         meshRef.current.position.x = smoothPos.current.x;

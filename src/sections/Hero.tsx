@@ -115,9 +115,16 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
           <div className="hidden lg:block w-full h-full">
             <InteractiveOctopus imagePath="/octopus-purple.png" isInteractive={true} />
           </div>
-          {/* Static centered version for mobile (hidden on lg) */}
-          <div className="lg:hidden w-full h-full">
-            <InteractiveOctopus imagePath="/octopus-purple.png" isInteractive={false} />
+          {/* Static image for mobile (no 3D, no movement) */}
+          <div className="lg:hidden w-full h-full flex items-center justify-center">
+            <img
+              src="/octopus-purple.png"
+              alt="Polvo"
+              className="max-w-[80%] max-h-[60vh] object-contain"
+              style={{
+                filter: 'drop-shadow(0 0 60px rgba(107, 33, 168, 0.5))',
+              }}
+            />
           </div>
         </div>
       </motion.div>

@@ -111,7 +111,14 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
       >
         {/* Interactive 3D Component - Full viewport (mobile & desktop) */}
         <div className="absolute inset-0">
-          <InteractiveOctopus imagePath="/octopus-purple.png" />
+          {/* Only interactive on desktop (lg and up) */}
+          <div className="hidden lg:block w-full h-full">
+            <InteractiveOctopus imagePath="/octopus-purple.png" isInteractive={true} />
+          </div>
+          {/* Static centered version for mobile (hidden on lg) */}
+          <div className="lg:hidden w-full h-full">
+            <InteractiveOctopus imagePath="/octopus-purple.png" isInteractive={false} />
+          </div>
         </div>
       </motion.div>
 

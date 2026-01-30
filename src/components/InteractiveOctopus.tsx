@@ -98,12 +98,23 @@ const OctopusMesh = ({ imagePath }: { imagePath: string }) => {
 
 interface InteractiveOctopusProps {
     imagePath: string;
+    isInteractive?: boolean;
     className?: string;
 }
 
-export default function InteractiveOctopus({ imagePath, className = "" }: InteractiveOctopusProps) {
+export default function InteractiveOctopus({
+    imagePath,
+    isInteractive = true,
+    className = ""
+}: InteractiveOctopusProps) {
     // Track global mouse and touch position
     useEffect(() => {
+        if (!isInteractive) {
+            mouseStore.x = 0;
+            mouseStore.y = 0;
+            return;
+        }
+
         const handleMouseMove = (e: MouseEvent) => {
             // Convert to normalized coordinates (-1 to 1)
             mouseStore.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -126,8 +137,11 @@ export default function InteractiveOctopus({ imagePath, className = "" }: Intera
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('touchmove', handleTouchMove);
             window.removeEventListener('touchstart', handleTouchMove);
+            // Reset position on cleanup
+            mouseStore.x = 0;
+            mouseStore.y = 0;
         };
-    }, []);
+    }, [isInteractive]);
 
     return (
         <div className={`w-full h-full ${className}`}>

@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { CircularGallery } from "@/components/ui/circular-gallery";
+import {
+  Stories,
+  StoriesContent,
+  Story,
+  StoryAuthor,
+  StoryAuthorImage,
+  StoryAuthorName,
+  StoryOverlay,
+  StoryImage,
+} from '@/components/ui/stories-carousel';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { projects } from '@/data/projects';
 
@@ -102,25 +111,29 @@ const Projects = () => {
 
         {/* Projects Circular Gallery */}
         <div
-          className={`relative w-full h-[600px] mb-12 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          className={`relative w-full mb-12 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
         >
           {filteredProjects.length > 0 ? (
-            <CircularGallery
-              items={filteredProjects.map(p => ({
-                id: p.id,
-                common: p.title,
-                binomial: p.description,
-                photo: {
-                  url: p.image,
-                  text: p.title,
-                  by: "Duda Motion"
-                }
-              }))}
-              radius={400} // Adjusted radius for better fit
-            />
+            <Stories>
+              <StoriesContent>
+                {filteredProjects.map((project) => (
+                  <Story className="aspect-[3/4] w-[200px]" key={project.id}>
+                    <StoryImage src={project.image} alt={project.title} />
+                    <StoryOverlay />
+                    <StoryAuthor>
+                      <StoryAuthorImage
+                        fallback={project.title.charAt(0)}
+                        name={project.title}
+                      />
+                      <StoryAuthorName>{project.title}</StoryAuthorName>
+                    </StoryAuthor>
+                  </Story>
+                ))}
+              </StoriesContent>
+            </Stories>
           ) : (
-            <div className="flex items-center justify-center w-full h-full text-white/50">
+            <div className="flex items-center justify-center w-full h-24 text-white/50">
               No projects found for this category.
             </div>
           )}

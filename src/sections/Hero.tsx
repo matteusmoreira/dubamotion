@@ -127,7 +127,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
 
         {/* Large Logo - Starts big, shrinks on scroll */}
         <div
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-100 ease-out pointer-events-auto"
+          className="absolute left-1/2 top-[30%] lg:top-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-100 ease-out pointer-events-auto"
           style={{
             transform: `translate(-50%, calc(-50% + ${logoTranslateY}vh)) scale(${logoScale})`,
             opacity: logoOpacity > 0 ? logoOpacity : initialLogoOpacity,
@@ -169,10 +169,10 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
 
         {/* Motion Design Text - appears after logo */}
         <div
-          className={`absolute left-8 lg:left-16 top-1/2 transform -translate-y-1/2 transition-all duration-1000 ${phase === 'full'
+          className={`absolute left-0 right-0 lg:right-auto lg:left-16 top-[58%] lg:top-1/2 transform -translate-y-1/2 transition-all duration-1000 ${phase === 'full'
             ? 'opacity-100 translate-x-0'
             : 'opacity-0 -translate-x-10'
-            }`}
+            } text-center lg:text-left`}
           style={{ zIndex: 40 }}
         >
           <h1 className="text-3xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
@@ -186,13 +186,13 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
 
         {/* Deepening Ideas Text */}
         <div
-          className={`absolute right-8 lg:right-16 top-1/2 transform -translate-y-1/2 transition-all duration-1000 delay-300 ${phase === 'full'
+          className={`absolute left-0 right-0 lg:left-auto lg:right-16 top-[78%] lg:top-1/2 transform -translate-y-1/2 transition-all duration-1000 delay-300 ${phase === 'full'
             ? 'opacity-100 translate-x-0'
             : 'opacity-0 translate-x-10'
-            }`}
+            } text-center lg:text-right`}
           style={{ zIndex: 40 }}
         >
-          <h2 className="text-2xl lg:text-4xl font-bold text-white leading-tight text-right drop-shadow-lg">
+          <h2 className="text-2xl lg:text-4xl font-bold text-white leading-tight drop-shadow-lg">
             <span className="block">{t('hero.deep1')}</span>
             <span className="block">{t('hero.deep2')}</span>
             <span className="block">{t('hero.deep3')}</span>

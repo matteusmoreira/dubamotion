@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 
 interface HeroProps {
   onShowreelClick?: () => void;
@@ -9,6 +9,20 @@ interface HeroProps {
 const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const [phase, setPhase] = useState<'logo' | 'transition' | 'full'>('logo');
   const heroRef = useRef<HTMLDivElement>(null);
+
+  // Parallax Effect Logic
+  const { scrollY } = useScroll();
+
+  // Vertical movement: moves down faster than scroll (parallax)
+  // Input: 0 to 1000px scroll
+  // Output: 0 to 400px movement down
+  const yRange = useTransform(scrollY, [0, 1000], [0, 400]);
+  const ySpring = useSpring(yRange, { stiffness: 100, damping: 20 });
+
+  // Rotation: simple sway effect based on scroll
+  const rotateRange = useTransform(scrollY, [0, 500, 1000], [0, 5, -5]);
+  const rotateSpring = useSpring(rotateRange, { stiffness: 100, damping: 20 });
+
 
   useEffect(() => {
     // Phase 1: Logo only (0-1.5s)
@@ -83,9 +97,13 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
         {/* Octopus Image - Appears during transition */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center transform-gpu"
-          style={{ zIndex: 10 }}
+          style={{
+            zIndex: 10,
+            y: phase !== 'logo' ? ySpring : 100, // Apply spring parallax when not in logo phase
+            rotate: phase !== 'logo' ? rotateSpring : 0
+          }}
           initial={{ opacity: 0, scale: 0.8, y: 100 }}
-          animate={phase !== 'logo' ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 100 }}
+          animate={phase !== 'logo' ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8, y: 100 }}
           transition={{
             duration: 1.5,
             type: "spring",
@@ -150,8 +168,8 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
         {/* Motion Design Text - appears after logo */}
         <div
           className={`absolute left-8 lg:left-16 top-1/2 transform -translate-y-1/2 transition-all duration-1000 ${phase === 'full'
-              ? 'opacity-100 translate-x-0'
-              : 'opacity-0 -translate-x-10'
+            ? 'opacity-100 translate-x-0'
+            : 'opacity-0 -translate-x-10'
             }`}
           style={{ zIndex: 40 }}
         >
@@ -167,8 +185,8 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
         {/* Deepening Ideas Text */}
         <div
           className={`absolute right-8 lg:right-16 top-1/2 transform -translate-y-1/2 transition-all duration-1000 delay-300 ${phase === 'full'
-              ? 'opacity-100 translate-x-0'
-              : 'opacity-0 translate-x-10'
+            ? 'opacity-100 translate-x-0'
+            : 'opacity-0 translate-x-10'
             }`}
           style={{ zIndex: 40 }}
         >

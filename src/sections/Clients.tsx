@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { InfiniteSlider } from '@/components/ui/infinite-slider';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Clients = () => {
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -41,11 +43,11 @@ const Clients = () => {
             backgroundClip: 'text',
           }}
         >
-          Customers
+          {t('clients.title1')}
           <br />
-          who have already
+          {t('clients.title2')}
           <br />
-          sailed with us
+          {t('clients.title3')}
         </h2>
       </div>
 

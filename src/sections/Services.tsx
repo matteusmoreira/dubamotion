@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { TubesBackground } from '@/components/ui/neon-flow';
 
 const Services = () => {
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<'animation' | 'postproduction' | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -26,21 +28,21 @@ const Services = () => {
   }, []);
 
   const animationServices = [
-    'Motion Graphics Design',
-    'Animação 2D e 3D',
-    'Animação de personagem',
-    'Animação frame a frame',
+    'services.anim.motion',
+    'services.anim.2d3d',
+    'services.anim.char',
+    'services.anim.frame',
   ];
 
   const postProductionServices = [
-    'Color Grading',
-    'Rotoscopia',
-    'Tracking',
-    'Composição',
-    'Edição',
-    'Mixagem',
-    'SoundFX',
-    'Finalização',
+    'services.post.color',
+    'services.post.roto',
+    'services.post.track',
+    'services.post.comp',
+    'services.post.edit',
+    'services.post.mix',
+    'services.post.sfx',
+    'services.post.final',
   ];
 
   return (
@@ -68,7 +70,7 @@ const Services = () => {
               backgroundClip: 'text',
             }}
           >
-            o que nós fazemos
+            {t('services.title')}
           </h2>
         </div>
 
@@ -86,7 +88,7 @@ const Services = () => {
               className="w-full flex items-center justify-between group"
             >
               <h3 className="text-3xl lg:text-4xl font-bold text-[#00FF88] group-hover:opacity-80 transition-opacity">
-                animação
+                {t('services.animation')}
               </h3>
               {openAccordion === 'animation' ? (
                 <ChevronUp className="text-[#00FF88]" size={32} />
@@ -106,7 +108,7 @@ const Services = () => {
                     className="flex items-center gap-3 text-white/80"
                   >
                     <span className="w-2 h-2 bg-[#00FF88] rounded-full" />
-                    {service}
+                    {t(service)}
                   </li>
                 ))}
               </ul>
@@ -125,7 +127,7 @@ const Services = () => {
               className="w-full flex items-center justify-between group"
             >
               <h3 className="text-3xl lg:text-4xl font-bold text-[#00FF88] group-hover:opacity-80 transition-opacity">
-                pós-produção
+                {t('services.postproduction')}
               </h3>
               {openAccordion === 'postproduction' ? (
                 <ChevronUp className="text-[#00FF88]" size={32} />
@@ -145,7 +147,7 @@ const Services = () => {
                     className="flex items-center gap-3 text-white/80"
                   >
                     <span className="w-2 h-2 bg-[#00FF88] rounded-full" />
-                    {service}
+                    {t(service)}
                   </div>
                 ))}
               </div>

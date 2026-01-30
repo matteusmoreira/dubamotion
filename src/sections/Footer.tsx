@@ -1,6 +1,8 @@
 import { Mail, Instagram, Twitter, Linkedin, Phone } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Footer = () => {
+  const { t } = useLanguage();
   const contactInfo = [
     { icon: Mail, text: 'contato@dubamotion.com.br', href: 'mailto:contato@dubamotion.com.br' },
     { icon: Instagram, text: '@dubamotion', href: 'https://instagram.com/dubamotion' },
@@ -46,7 +48,7 @@ const Footer = () => {
 
           {/* Copyright */}
           <p className="text-white/40 text-sm">
-            © 2026 Dubamotion. Todos os direitos reservados.
+            {t('footer.rights')}
           </p>
 
           {/* Back to Top */}
@@ -56,7 +58,7 @@ const Footer = () => {
             }}
             className="text-white/40 hover:text-[#00FF88] transition-colors text-sm"
           >
-            Voltar ao topo
+            {t('footer.backToTop')}
           </button>
         </div>
       </div>

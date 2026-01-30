@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Mail, Instagram, Twitter, Linkedin, Phone } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface HeaderProps {
   currentSection?: string;
@@ -7,7 +8,7 @@ interface HeaderProps {
 }
 
 const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) => {
-  const [language, setLanguage] = useState<'en' | 'pt'>('pt');
+  const { language, setLanguage, t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -35,11 +36,10 @@ const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) =>
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isVisible
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isVisible
           ? 'bg-black/90 backdrop-blur-md py-4'
           : 'bg-transparent py-6'
-      }`}
+        }`}
     >
       <div className="w-full px-8 lg:px-16 flex items-center justify-between">
         {/* Left Navigation */}
@@ -48,19 +48,18 @@ const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) =>
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
-              className={`nav-link text-sm tracking-wider uppercase ${
-                currentSection === item.id
+              className={`nav-link text-sm tracking-wider uppercase ${currentSection === item.id
                   ? 'text-white font-medium'
                   : 'text-white/70'
-              }`}
+                }`}
             >
-              {language === 'en' ? item.label : item.labelPt}
+              {t(`nav.${item.id}`)}
             </button>
           ))}
         </nav>
 
         {/* Center Logo - Small version that appears on scroll */}
-        <div 
+        <div
           className="absolute left-1/2 transform -translate-x-1/2 transition-all duration-300"
           style={{
             opacity: logoOpacity,
@@ -132,22 +131,20 @@ const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) =>
           <div className="flex items-center gap-1 lang-selector">
             <button
               onClick={() => setLanguage('en')}
-              className={`text-xs transition-colors ${
-                language === 'en'
+              className={`text-xs transition-colors ${language === 'en'
                   ? 'text-[#00FF88] font-medium'
                   : 'text-white/50 hover:text-white'
-              }`}
+                }`}
             >
               en
             </button>
             <span className="text-white/30">|</span>
             <button
               onClick={() => setLanguage('pt')}
-              className={`text-xs transition-colors ${
-                language === 'pt'
+              className={`text-xs transition-colors ${language === 'pt'
                   ? 'text-[#00FF88] font-medium'
                   : 'text-white/50 hover:text-white'
-              }`}
+                }`}
             >
               pt
             </button>

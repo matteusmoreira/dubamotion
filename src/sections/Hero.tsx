@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface HeroProps {
   onShowreelClick?: () => void;
@@ -7,6 +8,7 @@ interface HeroProps {
 }
 
 const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
+  const { t } = useLanguage();
   const [phase, setPhase] = useState<'logo' | 'transition' | 'full'>('logo');
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -174,11 +176,11 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
           style={{ zIndex: 40 }}
         >
           <h1 className="text-3xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
-            <span className="block">Motion</span>
-            <span className="block">design</span>
-            <span className="block text-white/80">and</span>
-            <span className="block">post</span>
-            <span className="block">production</span>
+            <span className="block">{t('hero.line1')}</span>
+            <span className="block">{t('hero.line2')}</span>
+            <span className="block text-white/80">{t('hero.line3')}</span>
+            <span className="block">{t('hero.line4')}</span>
+            <span className="block">{t('hero.line5')}</span>
           </h1>
         </div>
 
@@ -191,9 +193,9 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
           style={{ zIndex: 40 }}
         >
           <h2 className="text-2xl lg:text-4xl font-bold text-white leading-tight text-right drop-shadow-lg">
-            <span className="block">deepening</span>
-            <span className="block">your</span>
-            <span className="block">ideas</span>
+            <span className="block">{t('hero.deep1')}</span>
+            <span className="block">{t('hero.deep2')}</span>
+            <span className="block">{t('hero.deep3')}</span>
           </h2>
         </div>
 
@@ -204,7 +206,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
           style={{ zIndex: 40 }}
         >
           <span className="neon-text text-lg tracking-widest font-medium">
-            dubamotion
+            {t('hero.dubamotion')}
           </span>
         </div>
 
@@ -218,7 +220,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             onClick={onShowreelClick}
             className="neon-text text-lg tracking-widest font-medium hover:opacity-80 transition-opacity cursor-pointer"
           >
-            showrell
+            {t('hero.showreel')}
           </button>
         </div>
 

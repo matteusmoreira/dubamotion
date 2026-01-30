@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Warp } from "@paper-design/shaders-react";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface TeamMember {
   name: string;
@@ -10,6 +11,7 @@ interface TeamMember {
 }
 
 const Team = () => {
+  const { t, language } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -92,7 +94,7 @@ const Team = () => {
             className={`text-5xl lg:text-7xl font-bold green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
-            team
+            {t('team.title')}
           </h2>
         </div>
       </div>
@@ -156,7 +158,7 @@ const Team = () => {
                   {member.name}
                 </h3>
                 <p className="text-white/60 text-sm text-center leading-relaxed">
-                  {member.role}
+                  {language === 'en' ? member.role : member.rolePt}
                 </p>
               </div>
             ))}

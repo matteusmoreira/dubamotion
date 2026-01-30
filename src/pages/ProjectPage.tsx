@@ -1,10 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { projects } from '../data/projects';
 import { useEffect } from 'react';
 
 const ProjectPage = () => {
+    const { t, language } = useLanguage();
     const { id } = useParams();
     const navigate = useNavigate();
     const project = projects.find((p) => p.id === id);
@@ -17,12 +19,12 @@ const ProjectPage = () => {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center text-white">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-4">Project not found</h2>
+                    <h2 className="text-2xl font-bold mb-4">{t('project.notFound')}</h2>
                     <button
                         onClick={() => navigate('/')}
                         className="text-[#00FF88] hover:underline"
                     >
-                        Back to Home
+                        {t('project.backHome')}
                     </button>
                 </div>
             </div>
@@ -38,7 +40,7 @@ const ProjectPage = () => {
                     className="group flex items-center gap-2 text-white/70 hover:text-[#00FF88] transition-colors"
                 >
                     <ArrowLeft className="w-6 h-6 transform group-hover:-translate-x-1 transition-transform" />
-                    <span className="text-lg font-medium">Back to Projects</span>
+                    <span className="text-lg font-medium">{t('project.back')}</span>
                 </button>
             </nav>
 
@@ -69,10 +71,10 @@ const ProjectPage = () => {
                             {project.category}
                         </span>
                         <h1 className="text-6xl lg:text-9xl font-bold mb-6 tracking-tight">
-                            {project.title}
+                            {language === 'en' ? project.title : project.titlePt}
                         </h1>
                         <p className="text-xl lg:text-3xl text-white/80 max-w-2xl font-light leading-relaxed">
-                            {project.descriptionPt}
+                            {language === 'en' ? project.description : project.descriptionPt}
                         </p>
                     </motion.div>
                 </div>
@@ -100,9 +102,10 @@ const ProjectPage = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">Client</h3>
+
+                            <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">{t('project.client')}</h3>
                             <p className="text-2xl font-medium border-l-2 border-[#00FF88] pl-6">
-                                {project.title}
+                                {language === 'en' ? project.title : project.titlePt}
                             </p>
                         </motion.div>
 
@@ -112,7 +115,8 @@ const ProjectPage = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: 0.1 }}
                         >
-                            <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">Services</h3>
+
+                            <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">{t('project.services')}</h3>
                             <ul className="space-y-2 text-lg text-white/80 pl-6 border-l-2 border-white/10">
                                 <li>Motion Design</li>
                                 <li>Art Direction</li>
@@ -126,7 +130,8 @@ const ProjectPage = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: 0.2 }}
                         >
-                            <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">Year</h3>
+
+                            <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">{t('project.year')}</h3>
                             <p className="text-xl text-white/80 pl-6 border-l-2 border-white/10">2024</p>
                         </motion.div>
 
@@ -135,7 +140,7 @@ const ProjectPage = () => {
                             whileTap={{ scale: 0.98 }}
                             className="group flex items-center gap-3 bg-[#00FF88] text-black px-8 py-4 rounded-full font-bold mt-8"
                         >
-                            <span>View Live Project</span>
+                            <span>{t('project.viewLive')}</span>
                             <ExternalLink className="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" />
                         </motion.button>
                     </div>
@@ -195,9 +200,9 @@ const ProjectPage = () => {
             {/* Next Project Teaser (Simple Implementation) */}
             <section className="py-24 border-t border-white/10 mt-12 bg-zinc-900/30">
                 <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center">
-                    <h2 className="text-3xl font-bold mb-8">Ready to start your project?</h2>
+                    <h2 className="text-3xl font-bold mb-8">{t('project.cta.title')}</h2>
                     <button onClick={() => navigate('/#contact')} className="text-[#00FF88] text-xl hover:text-white transition-colors underline decoration-2 underline-offset-8">
-                        Let's talk about your idea
+                        {t('project.cta.button')}
                     </button>
                 </div>
             </section>

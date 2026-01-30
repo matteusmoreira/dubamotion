@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Mail, Instagram, Twitter, Linkedin, Phone, ChevronRight } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Warp } from "@paper-design/shaders-react";
 
 const About = () => {
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -66,7 +68,7 @@ const About = () => {
             className={`relative z-10 text-5xl lg:text-7xl font-bold green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
-            about
+            {t('about.title')}
           </h2>
         </div>
 
@@ -106,15 +108,14 @@ const About = () => {
             >
               <div className="space-y-6">
                 <p className="text-white/80 text-lg leading-relaxed">
-                  Somos um estúdio de animação 2D e pós produção.
-                  Somos uma{' '}
+                  {t('about.p1')}
                   <span className="text-white font-semibold">
-                    marca que potencializa narrativas
+                    {t('about.highlight')}
                   </span>
                   .
                 </p>
                 <p className="text-white/60 leading-relaxed">
-                  Aprofundando ideias desde 2021 e acumulando experiência à mais de uma década, somos um pequeno estúdio com ampla experiência em Digital e Social, prontos para trazer soluções inovadoras e dar movimento às suas Narrativas e Design.
+                  {t('about.p2')}
                 </p>
               </div>
 

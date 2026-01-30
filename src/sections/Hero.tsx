@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
+import InteractiveOctopus from '../components/InteractiveOctopus';
 
 interface HeroProps {
   onShowreelClick?: () => void;
@@ -93,37 +94,29 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
         />
       </div>
 
+      {/* Octopus Layer - Behind content, full screen movement */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        style={{
+          zIndex: 5,
+          y: phase !== 'logo' ? ySpring : 0,
+          rotate: phase !== 'logo' ? rotateSpring : 0
+        }}
+        initial={{ opacity: 0 }}
+        animate={phase !== 'logo' ? { opacity: 1 } : { opacity: 0 }}
+        transition={{
+          duration: 1.0,
+          ease: "easeOut"
+        }}
+      >
+        {/* Interactive 3D Component - Full viewport (mobile & desktop) */}
+        <div className="absolute inset-0">
+          <InteractiveOctopus imagePath="/octopus-purple.png" />
+        </div>
+      </motion.div>
+
       {/* Main Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-8">
-        {/* Octopus Image - Appears during transition */}
-        {/* Octopus Image - Appears during transition */}
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center transform-gpu"
-          style={{
-            zIndex: 10,
-            y: phase !== 'logo' ? ySpring : 100, // Apply spring parallax when not in logo phase
-            rotate: phase !== 'logo' ? rotateSpring : 0
-          }}
-          initial={{ opacity: 0, scale: 0.8, y: 100 }}
-          animate={phase !== 'logo' ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8, y: 100 }}
-          transition={{
-            duration: 1.5,
-            type: "spring",
-            bounce: 0.4,
-            ease: "easeOut"
-          }}
-        >
-          <img
-            src="/octopus-purple.png"
-            alt="3D Octopus"
-            loading="eager"
-            fetchPriority="high"
-            className="max-w-full max-h-[85vh] object-contain float-animation"
-            style={{
-              filter: 'drop-shadow(0 0 60px rgba(107, 33, 168, 0.5))',
-            }}
-          />
-        </motion.div>
 
         {/* Large Logo - Starts big, shrinks on scroll */}
         <div

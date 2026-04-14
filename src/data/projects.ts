@@ -16,7 +16,7 @@ export const projects: Project[] = [
         titlePt: 'C6 Bank',
         description: 'Animation',
         descriptionPt: 'Animação',
-        category: 'animation',
+        category: 'publicidade',
         image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=500&fit=crop',
     },
     {
@@ -25,7 +25,7 @@ export const projects: Project[] = [
         titlePt: 'Vida Neon',
         description: 'Animation',
         descriptionPt: 'Animação',
-        category: 'animation',
+        category: 'publicidade',
         image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=500&fit=crop',
     },
     {
@@ -34,7 +34,7 @@ export const projects: Project[] = [
         titlePt: 'Cyber Punk',
         description: 'Animation',
         descriptionPt: 'Animação',
-        category: 'animation',
+        category: 'publicidade',
         image: 'https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=400&h=500&fit=crop',
     },
     {
@@ -43,7 +43,7 @@ export const projects: Project[] = [
         titlePt: 'Tech Futuro',
         description: 'Animation',
         descriptionPt: 'Animação',
-        category: 'animation',
+        category: 'publicidade',
         image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=500&fit=crop',
     },
     {
@@ -52,7 +52,7 @@ export const projects: Project[] = [
         titlePt: 'Cyber Guerreiro',
         description: 'Animation',
         descriptionPt: 'Animação',
-        category: 'animation',
+        category: 'publicidade',
         image: 'https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=400&h=500&fit=crop',
     },
     {
@@ -61,7 +61,7 @@ export const projects: Project[] = [
         titlePt: 'Cidade Neon',
         description: 'Animation',
         descriptionPt: 'Animação',
-        category: 'animation',
+        category: 'publicidade',
         image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=500&fit=crop',
     },
 
@@ -185,7 +185,7 @@ export const projects: Project[] = [
         titlePt: 'Agência Duuna',
         description: 'Video Case',
         descriptionPt: 'Case de Vídeo',
-        category: 'video',
+        category: 'video-cases',
         image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=500&fit=crop',
     },
     {
@@ -194,7 +194,7 @@ export const projects: Project[] = [
         titlePt: 'Reel Corporativo',
         description: 'Video Case',
         descriptionPt: 'Case de Vídeo',
-        category: 'video',
+        category: 'video-cases',
         image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=500&fit=crop',
     },
     {
@@ -203,7 +203,7 @@ export const projects: Project[] = [
         titlePt: 'Videoclipe',
         description: 'Video Case',
         descriptionPt: 'Case de Vídeo',
-        category: 'video',
+        category: 'video-cases',
         image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=400&h=500&fit=crop',
     },
     {
@@ -212,7 +212,7 @@ export const projects: Project[] = [
         titlePt: 'Documentário',
         description: 'Video Case',
         descriptionPt: 'Case de Vídeo',
-        category: 'video',
+        category: 'video-cases',
         image: 'https://images.unsplash.com/photo-1524312895240-62287c800539?w=400&h=500&fit=crop',
     },
     {
@@ -221,7 +221,7 @@ export const projects: Project[] = [
         titlePt: 'Clipe Musical',
         description: 'Video Case',
         descriptionPt: 'Case de Vídeo',
-        category: 'video',
+        category: 'video-cases',
         image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=400&h=500&fit=crop',
     },
     {
@@ -230,7 +230,7 @@ export const projects: Project[] = [
         titlePt: 'Filme de Marca',
         description: 'Video Case',
         descriptionPt: 'Case de Vídeo',
-        category: 'video',
+        category: 'video-cases',
         image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=500&fit=crop',
     },
 ];

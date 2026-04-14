@@ -2,6 +2,25 @@ import { useEffect, useRef, useState } from 'react';
 import { InfiniteSlider } from '@/components/ui/infinite-slider';
 import { useLanguage } from '../contexts/LanguageContext';
 
+const clientLogos = [
+  "Abbott.png", "Artboard 1 copy 68.png", "Banco_original.png", "Bradesco.png", "Continental.png",
+  "Entrenos.png", "Ibinai.png", "Inatel.png", "Juntos-pela-zn.png", "Lexus.png",
+  "Michelin.png", "Neutrogena.png", "Next.png", "PlenaVi.png", "Puma.png",
+  "SOS_mata_atlantica.png", "Sony.png", "The_black_beef.png", "Toyota.png", "Ultragaz.png",
+  "Vedacit(1).png", "Vivo.png", "Yamaha.png", "Zul-digital.png", "acqio.png",
+  "arcos dorados.png", "betnacional.png", "bitso.png", "britania.png", "burger king.png",
+  "c6bank.png", "casas bahia.png", "clear.png", "clickbus.png", "cna.png",
+  "ctrl play.png", "darwin seguros.png", "embelleze.png", "entre nos (2).png", "estapar.png",
+  "estrela bet.png", "fifo_arts.png", "fluxo.png", "garoto.png", "hidratei.png",
+  "hook&loop.png", "infunsec.png", "itau.png", "john deere.png", "johnnie walker.png",
+  "kuat.png", "laserfast.png", "live now.png", "mary.png", "mercado livre.png",
+  "microsoft.png", "mitsubishi.png", "netshoes.png", "nissan.png", "nu bank.png",
+  "o boticario.png", "omo.png", "pagbank.png", "pubg.png", "renner.png",
+  "rexona.png", "samsung.png", "scatolove.png", "spaten.png", "stone.png",
+  "suzuki.png", "takeda.png", "tegra.png", "televisa.png", "telhanorte.png",
+  "tik tok.png", "vedacit.png", "warren.png", "yeesco.png", "youse.png", "zul digital.png"
+];
+
 const Clients = () => {
   const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
@@ -57,37 +76,15 @@ const Clients = () => {
           }`}
       >
         <div className="py-16 overflow-hidden bg-white">
-          <InfiniteSlider gap={24} duration={25} reverse className="w-full">
-            <img
-              src="https://motion-primitives.com/apple_music_logo.svg"
-              alt="Apple Music logo"
-              className="h-[120px] w-auto"
-            />
-            <img
-              src="https://motion-primitives.com/chrome_logo.svg"
-              alt="Chrome logo"
-              className="h-[120px] w-auto"
-            />
-            <img
-              src="https://motion-primitives.com/strava_logo.svg"
-              alt="Strava logo"
-              className="h-[120px] w-auto"
-            />
-            <img
-              src="https://motion-primitives.com/nintendo_logo.svg"
-              alt="Nintendo logo"
-              className="h-[120px] w-auto"
-            />
-            <img
-              src="https://motion-primitives.com/jquery_logo.svg"
-              alt="Jquery logo"
-              className="h-[120px] w-auto"
-            />
-            <img
-              src="https://motion-primitives.com/prada_logo.svg"
-              alt="Prada logo"
-              className="h-[120px] w-auto"
-            />
+          <InfiniteSlider gap={32} duration={80} reverse className="w-full">
+            {clientLogos.map((logo, index) => (
+              <img
+                key={index}
+                src={`/Logotipos/${logo}`}
+                alt={`Cliente ${index + 1}`}
+                className="h-[80px] md:h-[100px] w-auto object-contain grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300 mx-4"
+              />
+            ))}
           </InfiniteSlider>
         </div>
       </div>

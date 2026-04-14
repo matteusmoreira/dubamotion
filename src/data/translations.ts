@@ -33,23 +33,23 @@ export const translations = {
         // Services
         services: {
             title: 'what we do',
-            animation: 'animation',
+            animation: 'Motion Design',
             postproduction: 'post-production',
             anim: {
-                motion: 'Motion Graphics Design',
-                anim2d3d: '2D and 3D Animation',
+                flat: '2D Flat Animation',
+                stylized: '2D Stylized Animation',
+                mixed: 'Mixed Media',
+                collage: 'Collage',
+                rigging: 'Character Rigging',
                 char: 'Character Animation',
-                frame: 'Frame by Frame Animation',
             },
             post: {
+                edit: 'Editing',
                 color: 'Color Grading',
                 roto: 'Rotoscopy',
+                ai: 'AI Video Generation',
                 track: 'Tracking',
                 comp: 'Composition',
-                edit: 'Editing',
-                mix: 'Mixing',
-                sfx: 'SoundFX',
-                final: 'Finalization',
             },
         },
         // Clients
@@ -116,23 +116,23 @@ export const translations = {
         // Services
         services: {
             title: 'o que nós fazemos',
-            animation: 'animação',
+            animation: 'Motion Design',
             postproduction: 'pós-produção',
             anim: {
-                motion: 'Motion Graphics Design',
-                anim2d3d: 'Animação 2D e 3D',
+                flat: 'Animação 2D Flat',
+                stylized: 'Animação 2D Estilizada',
+                mixed: 'Mixed Midia',
+                collage: 'Colagem',
+                rigging: 'Rigging de personagem',
                 char: 'Animação de personagem',
-                frame: 'Animação frame a frame',
             },
             post: {
+                edit: 'Edição',
                 color: 'Color Grading',
                 roto: 'Rotoscopia',
+                ai: 'Geração de vídeos em IA',
                 track: 'Tracking',
                 comp: 'Composição',
-                edit: 'Edição',
-                mix: 'Mixagem',
-                sfx: 'SoundFX',
-                final: 'Finalização',
             },
         },
         // Clients

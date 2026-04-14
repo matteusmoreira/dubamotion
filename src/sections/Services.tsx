@@ -28,21 +28,21 @@ const Services = () => {
   }, []);
 
   const animationServices = [
-    'services.anim.motion',
-    'services.anim.2d3d',
+    'services.anim.flat',
+    'services.anim.stylized',
+    'services.anim.mixed',
+    'services.anim.collage',
+    'services.anim.rigging',
     'services.anim.char',
-    'services.anim.frame',
   ];
 
   const postProductionServices = [
+    'services.post.edit',
     'services.post.color',
     'services.post.roto',
+    'services.post.ai',
     'services.post.track',
     'services.post.comp',
-    'services.post.edit',
-    'services.post.mix',
-    'services.post.sfx',
-    'services.post.final',
   ];
 
   return (

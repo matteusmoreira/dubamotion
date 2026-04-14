@@ -10,7 +10,12 @@ interface TeamMember {
   image: string;
 }
 
-const Team = () => {
+interface TeamProps {
+  onNext?: () => void;
+  onPrev?: () => void;
+}
+
+const Team = ({ onNext, onPrev }: TeamProps = {}) => {
   const { t, language } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -102,18 +107,36 @@ const Team = () => {
       {/* Carousel */}
       <div className="max-w-6xl mx-auto px-8 lg:px-16">
         <div className="relative">
-          {/* Navigation Arrows */}
+          {/* Navigation Arrows (for Carousel integration) */}
           <button
-            onClick={prevSlide}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 lg:-translate-x-16 z-10 text-white/50 hover:text-[#00FF88] transition-colors"
-            aria-label="Previous"
+            onClick={() => {
+              if (onPrev) {
+                onPrev();
+              } else {
+                const aboutSection = document.getElementById('about');
+                if (aboutSection) {
+                  aboutSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }
+            }}
+            className={`absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 lg:-translate-x-16 z-10 text-white/50 hover:text-[#00FF88] transition-colors ${onPrev ? 'opacity-100' : 'opacity-100'}`}
+            aria-label="Previous section"
           >
             <ChevronLeft size={40} />
           </button>
           <button
-            onClick={nextSlide}
+            onClick={() => {
+              if (onNext) {
+                onNext();
+              } else {
+                const thanksSection = document.getElementById('thanks');
+                if (thanksSection) {
+                  thanksSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }
+            }}
             className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 lg:translate-x-16 z-10 text-white/50 hover:text-[#00FF88] transition-colors"
-            aria-label="Next"
+            aria-label="Next section"
           >
             <ChevronRight size={40} />
           </button>
@@ -130,7 +153,7 @@ const Team = () => {
                   }`}
               >
                 {/* Member Image */}
-                <div className="relative w-full aspect-[3/4] mb-6 overflow-hidden rounded-lg">
+                <div className="relative w-4/5 mx-auto aspect-[3/4] mb-6 overflow-hidden rounded-lg">
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-110"
                     style={{
@@ -164,7 +187,7 @@ const Team = () => {
             ))}
           </div>
 
-          {/* Dots Indicator */}
+        {/* Dots Indicator */}
           <div className="flex justify-center gap-2 mt-12">
             {teamMembers.map((_, index) => (
               <button

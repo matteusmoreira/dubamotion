@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { Warp } from "@paper-design/shaders-react";
 
-const Thanks = () => {
+interface ThanksProps {
+  onPrev?: () => void;
+}
+
+const Thanks = ({ onPrev }: ThanksProps = {}) => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -119,9 +123,13 @@ const Thanks = () => {
         <div className="mt-16 flex justify-start">
           <button
             onClick={() => {
-              const teamSection = document.getElementById('team');
-              if (teamSection) {
-                teamSection.scrollIntoView({ behavior: 'smooth' });
+              if (onPrev) {
+                onPrev();
+              } else {
+                const teamSection = document.getElementById('team');
+                if (teamSection) {
+                  teamSection.scrollIntoView({ behavior: 'smooth' });
+                }
               }
             }}
             className="text-white/50 hover:text-[#00FF88] transition-colors"

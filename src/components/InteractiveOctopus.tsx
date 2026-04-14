@@ -1,5 +1,5 @@
 import { useRef, useMemo, Suspense, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -31,8 +31,76 @@ const OctopusShaderMaterial = {
 
     void main() {
       vec4 color = texture2D(uTexture, vUv);
-      if (color.a < 0.1) discard;
+      if (color.a < 0.02) discard;
       gl_FragColor = color;
+    }
+  `
+};
+
+// WebGL Background Sea Shader
+const SeaShaderMaterial = {
+    vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+    fragmentShader: `
+    uniform float uTime;
+    uniform vec2 uResolution;
+    uniform vec2 uMouse;
+    varying vec2 vUv;
+
+    float hash(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
+    float noise(vec2 x) {
+        vec2 i = floor(x);
+        vec2 f = fract(x);
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+    }
+    
+    float fbm(vec2 x) {
+        float v = 0.0;
+        float a = 0.5;
+        vec2 shift = vec2(100.0);
+        mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.50));
+        for (int i = 0; i < 5; ++i) {
+            v += a * noise(x);
+            x = rot * x * 2.0 + shift;
+            a *= 0.5;
+        }
+        return v;
+    }
+
+    void main() {
+      vec2 uv = vUv * 3.0; // scale
+      uv += uMouse * 0.5; // react to mouse
+      
+      vec2 q = vec2(0.);
+      q.x = fbm(uv + 0.00 * uTime);
+      q.y = fbm(uv + vec2(1.0));
+
+      vec2 r = vec2(0.);
+      r.x = fbm(uv + 1.0 * q + vec2(1.7, 9.2) + 0.15 * uTime);
+      r.y = fbm(uv + 1.0 * q + vec2(8.3, 2.8) + 0.126 * uTime);
+
+      float f = fbm(uv + r);
+
+      // Colors matching the dark portal/sea reference but deep and fluid
+      vec3 color = mix(vec3(0.04, 0.01, 0.08), vec3(0.18, 0.05, 0.35), clamp((f*f)*4.0, 0.0, 1.0));
+      color = mix(color, vec3(0.05, 0.02, 0.20), clamp(length(q), 0.0, 1.0));
+      color = mix(color, vec3(0.02, 0.0, 0.05), clamp(length(r.x), 0.0, 1.0) * 0.6);
+
+      // Vignette effect to focus on center
+      float d = distance(vUv, vec2(0.5));
+      color *= smoothstep(0.85, 0.15, d);
+
+      gl_FragColor = vec4(color, 1.0);
     }
   `
 };
@@ -78,10 +146,10 @@ const OctopusMesh = ({ imagePath }: { imagePath: string }) => {
 
         // Apply position directly
         meshRef.current.position.x = smoothPos.current.x;
-        meshRef.current.position.y = smoothPos.current.y;
+        meshRef.current.position.y = smoothPos.current.y * 0.5;
 
         // Add gentle floating
-        meshRef.current.position.y += Math.sin(time * 1.0) * 0.02;
+        meshRef.current.position.y += Math.sin(time * 0.8) * 0.3;
 
         // Very subtle rotation (minimal)
         meshRef.current.rotation.y = smoothPos.current.x * 0.05;
@@ -89,8 +157,40 @@ const OctopusMesh = ({ imagePath }: { imagePath: string }) => {
     });
 
     return (
-        <mesh ref={meshRef} position={[0, 0, 0]} scale={[1, 1, 1]}>
-            <planeGeometry args={[3.5, 3.5, 24, 24]} />
+        <mesh ref={meshRef} position={[0, -0.1, -0.5]} scale={[1, 1, 1]}>
+            <planeGeometry args={[3.2, 3.2, 48, 48]} />
+            <shaderMaterial args={[shaderArgs]} />
+        </mesh>
+    );
+};
+
+const SeaMesh = () => {
+    const meshRef = useRef<THREE.Mesh>(null);
+    const { size } = useThree();
+
+    const shaderArgs = useMemo(() => ({
+        uniforms: {
+            uTime: { value: 0 },
+            uResolution: { value: new THREE.Vector2(size.width, size.height) },
+            uMouse: { value: new THREE.Vector2(0, 0) }
+        },
+        vertexShader: SeaShaderMaterial.vertexShader,
+        fragmentShader: SeaShaderMaterial.fragmentShader
+    }), [size]);
+
+    useFrame(() => {
+        if (!meshRef.current) return;
+        const material = meshRef.current.material as THREE.ShaderMaterial;
+        material.uniforms.uTime.value = performance.now() / 1000;
+        
+        // Smoothly interpolate mouse movement into the sea shader
+        material.uniforms.uMouse.value.x -= (mouseStore.x * 2.0 + material.uniforms.uMouse.value.x) * 0.05;
+        material.uniforms.uMouse.value.y -= (mouseStore.y * 2.0 + material.uniforms.uMouse.value.y) * 0.05;
+    });
+
+    return (
+        <mesh ref={meshRef} position={[0, 0, -2]}>
+            <planeGeometry args={[20, 20]} />
             <shaderMaterial args={[shaderArgs]} />
         </mesh>
     );
@@ -152,6 +252,7 @@ export default function InteractiveOctopus({
             >
                 <ambientLight intensity={1} />
                 <Suspense fallback={null}>
+                    <SeaMesh />
                     <OctopusMesh imagePath={imagePath} />
                 </Suspense>
             </Canvas>

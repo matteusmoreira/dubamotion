@@ -3,7 +3,11 @@ import { Mail, Instagram, Twitter, Linkedin, Phone, ChevronRight } from 'lucide-
 import { useLanguage } from '../contexts/LanguageContext';
 import { Warp } from "@paper-design/shaders-react";
 
-const About = () => {
+interface AboutProps {
+  onNext?: () => void;
+}
+
+const About = ({ onNext }: AboutProps = {}) => {
   const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -123,9 +127,13 @@ const About = () => {
               <div className="mt-12 flex justify-end">
                 <button
                   onClick={() => {
-                    const teamSection = document.getElementById('team');
-                    if (teamSection) {
-                      teamSection.scrollIntoView({ behavior: 'smooth' });
+                    if (onNext) {
+                      onNext();
+                    } else {
+                      const teamSection = document.getElementById('team');
+                      if (teamSection) {
+                        teamSection.scrollIntoView({ behavior: 'smooth' });
+                      }
                     }
                   }}
                   className="text-white/50 hover:text-[#00FF88] transition-colors"

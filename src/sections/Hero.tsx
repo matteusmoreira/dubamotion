@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import InteractiveOctopus from '../components/InteractiveOctopus';
@@ -32,7 +32,6 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   // At 0: Scale is HUGE (e.g. 30), it's black.
   // At 1: Scale is 1, it's white.
   // Filter transition: 0 to 0.7 staying black, 0.7 to 1 going to white
-  const smoothProgress = useSpring(scrollProgress, { stiffness: 100, damping: 20 });
   
   // Custom manual interpolation for performance directly in style
   const logoScale = Math.max(1, 30 - scrollProgress * 29);

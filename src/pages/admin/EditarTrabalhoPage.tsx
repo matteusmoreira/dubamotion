@@ -113,7 +113,7 @@ export default function EditarTrabalhoPage() {
     try {
       const webpFile = await convertToWebp(file);
       const fileName = `${Date.now()}.webp`;
-      const { data, error } = await supabase.storage
+      const { data } = await supabase.storage
         .from('trabalhos-capas')
         .upload(fileName, webpFile, { upsert: true });
 
@@ -137,7 +137,7 @@ export default function EditarTrabalhoPage() {
     try {
       const webpFile = await convertToWebp(file);
       const fileName = `${Date.now()}_media_${Math.random().toString(36).substring(7)}.webp`;
-      const { data, error } = await supabase.storage
+      const { data } = await supabase.storage
         .from('trabalhos-capas')
         .upload(fileName, webpFile, { upsert: true });
 

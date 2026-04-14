@@ -60,13 +60,7 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
     return () => observer.disconnect();
   }, []);
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % teamMembers.length);
-  };
 
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + teamMembers.length) % teamMembers.length);
-  };
 
   return (
     <section

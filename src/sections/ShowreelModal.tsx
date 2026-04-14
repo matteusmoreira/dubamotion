@@ -16,7 +16,9 @@ const ShowreelModal = ({ isOpen, onClose }: ShowreelModalProps) => {
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => setIsVisible(true), 50);
-    } else {
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    else {
       setIsVisible(false);
     }
   }, [isOpen]);

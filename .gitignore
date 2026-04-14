@@ -1,2 +1,10 @@
 node_modules
 .vercel
+dist
+dist-ssr
+.env
+.env.*
+.env.local
+.env.*.local
+coverage
+*.local

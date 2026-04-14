@@ -49,7 +49,7 @@ const Services = () => {
     <section
       id="services"
       ref={sectionRef}
-      className="relative min-h-screen w-full bg-black py-24 overflow-hidden"
+      className="relative w-full bg-black py-24 overflow-hidden"
     >
       {/* Neon Flow Background */}
       <div className="absolute inset-0 z-0">

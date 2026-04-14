@@ -42,7 +42,7 @@ const About = ({ onNext }: AboutProps = {}) => {
     <section
       id="about"
       ref={sectionRef}
-      className="relative min-h-screen w-full bg-black py-24 overflow-hidden"
+      className="relative w-full bg-black py-24 overflow-hidden"
     >
       {/* Content Wrapper */}
       <div className="relative z-10">

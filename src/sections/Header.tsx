@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Mail, Instagram, Twitter, Linkedin, Phone } from 'lucide-react';
+import { Mail, Instagram, Linkedin } from 'lucide-react';
+import { FaVimeoV, FaWhatsapp } from 'react-icons/fa';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface HeaderProps {
@@ -99,13 +100,13 @@ const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) =>
               <Instagram size={18} />
             </a>
             <a
-              href="https://twitter.com/dubamotion"
+              href="https://vimeo.com/dubamotion"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white/70 hover:text-[#00FF88] transition-colors"
-              aria-label="Twitter"
+              aria-label="Vimeo"
             >
-              <Twitter size={18} />
+              <FaVimeoV size={18} />
             </a>
             <a
               href="https://linkedin.com/company/dubamotion"
@@ -123,7 +124,7 @@ const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) =>
               className="text-white/70 hover:text-[#00FF88] transition-colors"
               aria-label="WhatsApp"
             >
-              <Phone size={18} />
+              <FaWhatsapp size={18} />
             </a>
           </div>
 

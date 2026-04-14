@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface ShowreelModalProps {
   isOpen: boolean;
@@ -8,6 +9,9 @@ interface ShowreelModalProps {
 
 const ShowreelModal = ({ isOpen, onClose }: ShowreelModalProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const { language } = useLanguage();
+  
+  const videoId = language === 'en' ? '910534861' : '875142318';
 
   useEffect(() => {
     if (isOpen) {
@@ -48,7 +52,7 @@ const ShowreelModal = ({ isOpen, onClose }: ShowreelModalProps) => {
       {/* Video Container */}
       <div className="w-full max-w-7xl aspect-video px-4 md:px-12">
         <iframe
-          src="https://player.vimeo.com/video/875142318?autoplay=1&title=0&byline=0&portrait=0"
+          src={`https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0`}
           className="w-full h-full rounded-lg shadow-2xl bg-black"
           frameBorder="0"
           allow="autoplay; fullscreen; picture-in-picture"

@@ -72,7 +72,7 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
     <section
       id="team"
       ref={sectionRef}
-      className="relative min-h-screen w-full bg-black py-24"
+      className="relative w-full bg-black py-24"
     >
       {/* Gradient Header */}
       {/* Gradient Header */}

@@ -52,7 +52,7 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
     <section
       id="thanks"
       ref={sectionRef}
-      className="relative min-h-screen w-full bg-black py-24"
+      className="relative w-full bg-black py-24"
     >
       {/* Gradient Header */}
       <div className="relative h-32 mb-16 overflow-hidden w-full">

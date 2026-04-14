@@ -1,19 +1,40 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
-import { projects } from '../data/projects';
-import { useEffect } from 'react';
+import { ArrowLeft, ExternalLink, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import type { Trabalho } from '../lib/supabase';
+import { useEffect, useState } from 'react';
 
 const ProjectPage = () => {
     const { t, language } = useLanguage();
     const { id } = useParams();
     const navigate = useNavigate();
-    const project = projects.find((p) => p.id === id);
+    const [project, setProject] = useState<Trabalho | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, []);
+        if (id) {
+            supabase
+                .from('trabalhos')
+                .select('*')
+                .eq('id', id)
+                .single()
+                .then(({ data }) => {
+                    setProject(data);
+                    setLoading(false);
+                });
+        }
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center text-white">
+                <Loader2 className="w-8 h-8 text-[#00FF88] animate-spin" />
+            </div>
+        );
+    }
 
     if (!project) {
         return (
@@ -54,8 +75,8 @@ const ProjectPage = () => {
             >
                 <div className="absolute inset-0 w-full h-full">
                     <img
-                        src={project.image}
-                        alt={project.title}
+                        src={project.capa_url || ''}
+                        alt={project.titulo}
                         className="w-full h-full object-cover opacity-60 scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
@@ -68,13 +89,13 @@ const ProjectPage = () => {
                         transition={{ delay: 0.2, duration: 0.8 }}
                     >
                         <span className="inline-block px-4 py-2 border border-[#00FF88]/30 rounded-full text-[#00FF88] text-sm tracking-widest uppercase mb-6 backdrop-blur-sm bg-black/20">
-                            {project.category}
+                            {project.categoria}
                         </span>
                         <h1 className="text-6xl lg:text-9xl font-bold mb-6 tracking-tight">
-                            {language === 'en' ? project.title : project.titlePt}
+                            {language === 'en' ? (project.titulo_en || project.titulo) : project.titulo}
                         </h1>
                         <p className="text-xl lg:text-3xl text-white/80 max-w-2xl font-light leading-relaxed">
-                            {language === 'en' ? project.description : project.descriptionPt}
+                            {language === 'en' ? (project.descricao_en || project.descricao) : project.descricao}
                         </p>
                     </motion.div>
                 </div>
@@ -105,7 +126,7 @@ const ProjectPage = () => {
 
                             <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">{t('project.client')}</h3>
                             <p className="text-2xl font-medium border-l-2 border-[#00FF88] pl-6">
-                                {language === 'en' ? project.title : project.titlePt}
+                                {language === 'en' ? (project.titulo_en || project.titulo) : project.titulo}
                             </p>
                         </motion.div>
 
@@ -118,9 +139,7 @@ const ProjectPage = () => {
 
                             <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">{t('project.services')}</h3>
                             <ul className="space-y-2 text-lg text-white/80 pl-6 border-l-2 border-white/10">
-                                <li>Motion Design</li>
-                                <li>Art Direction</li>
-                                <li>{project.category === 'animation' ? '2D Animation' : 'Visual Effects'}</li>
+                                <li className="capitalize">{project.categoria}</li>
                             </ul>
                         </motion.div>
 
@@ -132,17 +151,26 @@ const ProjectPage = () => {
                         >
 
                             <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">{t('project.year')}</h3>
-                            <p className="text-xl text-white/80 pl-6 border-l-2 border-white/10">2024</p>
+                            <p className="text-xl text-white/80 pl-6 border-l-2 border-white/10">{project.ano || '2024'}</p>
                         </motion.div>
 
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="group flex items-center gap-3 bg-[#00FF88] text-black px-8 py-4 rounded-full font-bold mt-8"
-                        >
-                            <span>{t('project.viewLive')}</span>
-                            <ExternalLink className="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" />
-                        </motion.button>
+                        {project.vimeo_url && (
+                            <a
+                                href={project.vimeo_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-block"
+                            >
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="group flex items-center gap-3 bg-[#00FF88] text-black px-8 py-4 rounded-full font-bold mt-8"
+                                >
+                                    <span>{t('project.viewLive')}</span>
+                                    <ExternalLink className="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" />
+                                </motion.button>
+                            </a>
+                        )}
                     </div>
 
                     {/* Project Gallery/Description */}
@@ -154,45 +182,61 @@ const ProjectPage = () => {
                             transition={{ duration: 0.6 }}
                         >
                             <p className="text-xl lg:text-2xl leading-relaxed text-white/80 mb-12">
-                                This project represents a unique approach to {project.category} design,
-                                blending modern aesthetics with fluid animation to create an immersive user experience.
-                                {project.descriptionPt} allows for a deeper connection between the brand and its audience.
+                                {language === 'en' ? (project.descricao_en || project.descricao) : project.descricao}
                             </p>
                         </motion.div>
 
-                        {/* Placeholder Grid for Project Images */}
-                        <div className="grid gap-8">
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.8 }}
-                                className="aspect-video w-full rounded-2xl overflow-hidden bg-white/5 border border-white/10"
-                            >
-                                <img src={project.image} alt="Project detail 1" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
-                            </motion.div>
-
-                            <div className="grid grid-cols-2 gap-8">
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.8, delay: 0.1 }}
-                                    className="aspect-square w-full rounded-2xl overflow-hidden bg-white/5 border border-white/10"
-                                >
-                                    <img src={project.image} alt="Project detail 2" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
-                                </motion.div>
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.8, delay: 0.2 }}
-                                    className="aspect-square w-full rounded-2xl overflow-hidden bg-white/5 border border-white/10"
-                                >
-                                    <img src={project.image} alt="Project detail 3" className="w-full h-full object-cover mix-blend-overlay opacity-80" />
-                                </motion.div>
+                        {/* Project Gallery from midias */}
+                        {project.midias && project.midias.length > 0 && (
+                            <div className="grid grid-cols-1 gap-12">
+                                {project.midias.map((media, index) => {
+                                    if (media.tipo === 'image') {
+                                        return (
+                                            <motion.div
+                                                key={media.id || index}
+                                                initial={{ opacity: 0, y: 30 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true, margin: "-100px" }}
+                                                transition={{ duration: 0.8 }}
+                                                className="w-full rounded-2xl overflow-hidden bg-white/[0.02] border border-white/10 flex justify-center"
+                                            >
+                                                <img 
+                                                    src={media.url} 
+                                                    alt={`Project detail ${index + 1}`} 
+                                                    className="w-full h-auto block" 
+                                                />
+                                            </motion.div>
+                                        );
+                                    } else if (media.tipo === 'youtube') {
+                                        const getYoutubeEmbedUrl = (url: string) => {
+                                            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                                            const match = url.match(regExp);
+                                            return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : url;
+                                        };
+                                        return (
+                                            <motion.div
+                                                key={media.id || index}
+                                                initial={{ opacity: 0, y: 30 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true, margin: "-100px" }}
+                                                transition={{ duration: 0.8 }}
+                                                className="w-full aspect-video rounded-2xl overflow-hidden bg-black/50 border border-white/10"
+                                            >
+                                                <iframe
+                                                    src={getYoutubeEmbedUrl(media.url)}
+                                                    className="w-full h-full"
+                                                    title={`YouTube video ${index + 1}`}
+                                                    frameBorder="0"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                />
+                                            </motion.div>
+                                        );
+                                    }
+                                    return null;
+                                })}
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </section>

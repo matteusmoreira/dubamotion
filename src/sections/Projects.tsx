@@ -9,52 +9,47 @@ import {
   StoryOverlay,
   StoryImage,
 } from '@/components/ui/stories-carousel';
-import { projects } from '@/data/projects';
+import { supabase } from '@/lib/supabase';
+import type { Trabalho } from '@/lib/supabase';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Projects = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<string | null>(null);
+  const [trabalhos, setTrabalhos] = useState<Trabalho[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
 
-  const categories = [
-    {
-      id: 'mixed',
-      title: 'Mixed Midia',
-      titlePt: 'Mixed Midia',
-      description: 'Projetos que incluem animação 2D e composição com diversos elementos.',
-      descriptionPt: 'Projetos que incluem animação 2D e composição com diversos elementos.',
-    },
-    {
-      id: 'publicidade',
-      title: 'Publicidade',
-      titlePt: 'Publicidade',
-      description: 'Motion e Pós produção em vídeos publicitários online para marcas em plataformas diversas.',
-      descriptionPt: 'Motion e Pós produção em vídeos publicitários online para marcas em plataformas diversas.',
-    },
-    {
-      id: 'social',
-      title: 'Social Ads',
-      titlePt: 'Social Ads',
-      description: 'Projetos para publicidades em redes sociais',
-      descriptionPt: 'Projetos para publicidades em redes sociais',
-    },
-    {
-      id: 'video-cases',
-      title: 'Video Cases',
-      titlePt: 'Video Cases',
-      description: 'Videocases para apresentação em festivais diversos',
-      descriptionPt: 'Videocases para apresentação em festivais diversos',
-    },
-    {
-      id: 'autoral',
-      title: 'Autoral e Estudos',
-      titlePt: 'Autoral e Estudos',
-      description: 'Jobs feitos com intuito de estudo.',
-      descriptionPt: 'Jobs feitos com intuito de estudo.',
-    },
-  ];
+  const [categories, setCategories] = useState<{id: string, title: string, titlePt: string, description: string, descriptionPt: string}[]>([]);
+
+  // Buscar trabalhos publicados e categorias do Supabase
+  useEffect(() => {
+    supabase.from('categorias').select('*').order('ordem').then(({ data }) => {
+      if (data) {
+        setCategories(data.map(c => ({
+          id: c.slug,
+          title: c.nome,
+          titlePt: c.nome,
+          description: c.descricao_en || c.descricao || '',
+          descriptionPt: c.descricao || ''
+        })));
+      }
+    });
+
+    supabase
+      .from('trabalhos')
+      .select('*')
+      .eq('publicado', true)
+      .order('ordem')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        setTrabalhos(data || []);
+        setLoadingProjects(false);
+      });
+  }, []);
+
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -81,8 +76,9 @@ const Projects = () => {
   };
 
   const filteredProjects = currentCategory
-    ? projects.filter((p) => p.category === currentCategory)
+    ? trabalhos.filter((p) => p.categoria === currentCategory)
     : [];
+
 
   const currentCatData = currentCategory ? categories.find(c => c.id === currentCategory) : null;
 
@@ -90,7 +86,7 @@ const Projects = () => {
     <section
       id="work"
       ref={sectionRef}
-      className="relative min-h-screen w-full bg-black py-24"
+      className="relative w-full bg-black py-24"
     >
       <div className="max-w-7xl mx-auto px-8 lg:px-16">
         {/* Header with Title and Filter Tags */}
@@ -164,31 +160,41 @@ const Projects = () => {
                  </div>
                </div>
                
-               {filteredProjects.length > 0 ? (
-                <div className="w-full relative">
-                  <Stories>
-                    <StoriesContent>
-                      {filteredProjects.map((project) => (
-                        <Story
-                          className="aspect-[3/4] w-[280px] lg:w-[320px] group"
-                          key={project.id}
-                          onClick={() => handleProjectClick(project.id)}
-                        >
-                          <StoryImage src={project.image} alt={project.title} className="transition-transform duration-700 group-hover:scale-105" />
-                          <StoryOverlay className="bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
-                          <StoryAuthor>
-                            <StoryAuthorName className="text-2xl font-bold translate-y-4 group-hover:translate-y-0 transition-transform duration-500">{project.title}</StoryAuthorName>
-                          </StoryAuthor>
-                        </Story>
-                      ))}
-                    </StoriesContent>
-                  </Stories>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center w-full h-[40vh] bg-white/[0.02] rounded-3xl text-white/40 border border-white/5 border-dashed">
-                  Nenhum projeto encontrado para esta categoria.
-                </div>
-              )}
+               {loadingProjects ? (
+                 <div className="flex items-center justify-center h-[30vh]">
+                   <div className="w-8 h-8 border-2 border-[#00FF88] border-t-transparent rounded-full animate-spin" />
+                 </div>
+               ) : filteredProjects.length > 0 ? (
+                 <div className="w-full relative">
+                   <Stories>
+                     <StoriesContent>
+                       {filteredProjects.map((project) => (
+                         <Story
+                           className="aspect-[3/4] w-[280px] lg:w-[320px] group"
+                           key={project.id}
+                           onClick={() => handleProjectClick(project.id)}
+                         >
+                           <StoryImage
+                             src={project.capa_url || 'https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=400&h=500&fit=crop'}
+                             alt={project.titulo}
+                             className="transition-transform duration-700 group-hover:scale-105"
+                           />
+                           <StoryOverlay className="bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+                           <StoryAuthor>
+                             <StoryAuthorName className="text-2xl font-bold translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                               {project.titulo}
+                             </StoryAuthorName>
+                           </StoryAuthor>
+                         </Story>
+                       ))}
+                     </StoriesContent>
+                   </Stories>
+                 </div>
+               ) : (
+                 <div className="flex items-center justify-center w-full h-[40vh] bg-white/[0.02] rounded-3xl text-white/40 border border-white/5 border-dashed">
+                   Nenhum projeto encontrado para esta categoria.
+                 </div>
+               )}
             </div>
           )}
         </div>

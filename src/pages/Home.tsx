@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Header from '../sections/Header';
 import Hero from '../sections/Hero';
 import ShowreelModal from '../sections/ShowreelModal';
@@ -15,6 +15,8 @@ function Home() {
     const [currentSection, setCurrentSection] = useState('work');
     const [scrollProgress, setScrollProgress] = useState(0);
     const [carouselIndex, setCarouselIndex] = useState(0);
+    const [carouselHeight, setCarouselHeight] = useState<number | null>(null);
+    const carouselSlideRefs = useRef<Array<HTMLDivElement | null>>([]);
 
     // Track scroll progress for logo animation
     useEffect(() => {
@@ -91,6 +93,37 @@ function Home() {
         };
     }, [showreelOpen]);
 
+    useEffect(() => {
+        const updateCarouselHeight = () => {
+            if (window.innerWidth < 1024) {
+                setCarouselHeight(null);
+                return;
+            }
+
+            const activeSlide = carouselSlideRefs.current[carouselIndex];
+            setCarouselHeight(activeSlide?.offsetHeight ?? null);
+        };
+
+        updateCarouselHeight();
+
+        const resizeObserver = new ResizeObserver(() => {
+            updateCarouselHeight();
+        });
+
+        carouselSlideRefs.current.forEach((slide) => {
+            if (slide) {
+                resizeObserver.observe(slide);
+            }
+        });
+
+        window.addEventListener('resize', updateCarouselHeight);
+
+        return () => {
+            resizeObserver.disconnect();
+            window.removeEventListener('resize', updateCarouselHeight);
+        };
+    }, [carouselIndex]);
+
     return (
         <div className="relative bg-black min-h-screen">
             {/* Fixed Header with small logo */}
@@ -104,16 +137,29 @@ function Home() {
                 {/* Carousel for About, Team, Thanks on lg screens */}
                 <div 
                     className="relative w-full overflow-hidden bg-black"
-                    style={{ '--carousel-index': carouselIndex } as React.CSSProperties}
+                    style={{
+                        '--carousel-index': carouselIndex,
+                        minHeight: carouselHeight ? `${carouselHeight}px` : undefined,
+                    } as React.CSSProperties}
                 >
-                    <div className="flex flex-col lg:flex-row lg:w-[300%] transition-transform duration-1000 ease-in-out lg:[transform:translateX(calc(-33.333333%*var(--carousel-index)))]">
-                        <div className="w-full lg:w-1/3 shrink-0">
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:w-[300%] transition-transform duration-1000 ease-in-out lg:[transform:translateX(calc(-33.333333%*var(--carousel-index)))]">
+                        <div
+                            ref={(node) => {
+                                carouselSlideRefs.current[0] = node;
+                            }}
+                            className="w-full lg:w-1/3 shrink-0"
+                        >
                             <About onNext={() => {
                                 if (window.innerWidth >= 1024) setCarouselIndex(1);
                                 else document.getElementById('team')?.scrollIntoView({ behavior: 'smooth' });
                             }} />
                         </div>
-                        <div className="w-full lg:w-1/3 shrink-0">
+                        <div
+                            ref={(node) => {
+                                carouselSlideRefs.current[1] = node;
+                            }}
+                            className="w-full lg:w-1/3 shrink-0"
+                        >
                             <Team 
                                 onNext={() => {
                                     if (window.innerWidth >= 1024) setCarouselIndex(2);
@@ -125,7 +171,12 @@ function Home() {
                                 }} 
                             />
                         </div>
-                        <div className="w-full lg:w-1/3 shrink-0">
+                        <div
+                            ref={(node) => {
+                                carouselSlideRefs.current[2] = node;
+                            }}
+                            className="w-full lg:w-1/3 shrink-0"
+                        >
                             <Thanks onPrev={() => {
                                 if (window.innerWidth >= 1024) setCarouselIndex(1);
                                 else document.getElementById('team')?.scrollIntoView({ behavior: 'smooth' });

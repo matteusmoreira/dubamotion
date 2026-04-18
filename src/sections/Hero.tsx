@@ -31,7 +31,11 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const [isShowreelHovered, setIsShowreelHovered] = useState(false);
   const videoId = getShowreelVideoId(language);
   const progress = clamp(scrollProgress);
-  const heroPrimaryLines = ['Motion design', 'and', 'post production'];
+  const heroPrimaryLines = [
+    t('hero.primary1'),
+    t('hero.primary2'),
+    t('hero.primary3'),
+  ];
 
   const introPhase = easeInOutCubic(segment(progress, 0, 0.24));
   const labelPhase = easeOutCubic(segment(progress, 0.08, 0.22));

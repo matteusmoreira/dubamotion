@@ -69,7 +69,7 @@ const About = ({ onNext }: AboutProps = {}) => {
           </div>
 
           <h2
-            className={`relative z-10 text-5xl lg:text-7xl font-bold green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`relative z-10 text-5xl font-bold text-white transition-all duration-1000 lg:text-7xl ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
             {t('about.title')}

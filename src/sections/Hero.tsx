@@ -1,25 +1,74 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useState } from 'react';
 import InteractiveOctopus from '../components/InteractiveOctopus';
+import { useLanguage } from '../contexts/LanguageContext';
+import { getShowreelVideoId } from '../lib/showreel';
+import octopusHeroImage from '../../polvo/0112.png';
 
 interface HeroProps {
   onShowreelClick?: () => void;
   scrollProgress?: number;
 }
 
+const clamp = (value: number, min = 0, max = 1) => Math.min(Math.max(value, min), max);
+
+const segment = (value: number, start: number, end: number) => {
+  if (end <= start) return 0;
+  return clamp((value - start) / (end - start));
+};
+
+const mix = (from: number, to: number, value: number) => from + (to - from) * value;
+
+const easeOutCubic = (value: number) => 1 - Math.pow(1 - value, 3);
+
+const easeInOutCubic = (value: number) => {
+  return value < 0.5
+    ? 4 * value * value * value
+    : 1 - Math.pow(-2 * value + 2, 3) / 2;
+};
+
 const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
-  const { t } = useLanguage();
-  const heroRef = useRef<HTMLDivElement>(null);
+  const { t, language } = useLanguage();
+  const [isShowreelHovered, setIsShowreelHovered] = useState(false);
+  const videoId = getShowreelVideoId(language);
+  const progress = clamp(scrollProgress);
+  const heroPrimaryLines = ['Motion design', 'and', 'post production'];
 
-  // Parallax Effect Logic
-  const { scrollY } = useScroll();
+  const introPhase = easeInOutCubic(segment(progress, 0, 0.24));
+  const labelPhase = easeOutCubic(segment(progress, 0.08, 0.22));
+  const labelExitPhase = easeInOutCubic(segment(progress, 0.34, 0.46));
+  const dockPhase = easeInOutCubic(segment(progress, 0.16, 0.36));
+  const handoffPhase = easeInOutCubic(segment(progress, 0.24, 0.4));
+  const statementPhase = easeOutCubic(segment(progress, 0.28, 0.48));
+  const octopusRevealPhase = easeOutCubic(segment(progress, 0.32, 0.54));
+  const octopusDriftPhase = easeInOutCubic(segment(progress, 0.68, 0.84));
+  const deepeningPhase = easeOutCubic(segment(progress, 0.72, 0.9));
+  const exitPhase = easeInOutCubic(segment(progress, 0.88, 1));
 
-  // Vertical movement for background
-  const yRange = useTransform(scrollY, [0, 1000], [0, 200]);
-  const ySpring = useSpring(yRange, { stiffness: 100, damping: 20 });
-  const rotateRange = useTransform(scrollY, [0, 500, 1000], [0, 2, -2]);
-  const rotateSpring = useSpring(rotateRange, { stiffness: 100, damping: 20 });
+  const baseOverlayOpacity = mix(0.04, 0.18, deepeningPhase);
+  const atmosphereOpacity = mix(0.12, 0.74, statementPhase);
+  const vignetteOpacity = mix(0.12, 0.48, deepeningPhase);
+  const labelOpacity = labelPhase * (1 - labelExitPhase);
+  const statementOpacity = statementPhase * mix(1, 0.82, deepeningPhase) * (1 - exitPhase * 0.3);
+  const deepeningOpacity = deepeningPhase * (1 - exitPhase * 0.35);
+  const indicatorOpacity = clamp(labelOpacity + statementOpacity * 0.55) * (1 - exitPhase * 0.45);
+
+  const markRestScale = mix(1.44, 1.2, introPhase);
+  const markScale = mix(markRestScale, 0.16, dockPhase);
+  const markRestTranslateY = mix(12, 18, introPhase);
+  const markTranslateY = mix(markRestTranslateY, -35, dockPhase);
+  const markOpacity = mix(1, 0.06, handoffPhase) * (1 - exitPhase * 0.2);
+
+  const octopusOpacity = octopusRevealPhase * (1 - exitPhase * 0.18);
+  const octopusScale = mix(0.9, 1.08, octopusRevealPhase)
+    + mix(0, 0.18, octopusDriftPhase)
+    + mix(0, 0.4, deepeningPhase)
+    - mix(0, 0.08, exitPhase);
+  const octopusOffsetX = mix(0, -20, octopusDriftPhase);
+  const octopusOffsetY = mix(72, 12, octopusRevealPhase)
+    + mix(0, -8, octopusDriftPhase)
+    + mix(0, -8, deepeningPhase)
+    - mix(0, 6, exitPhase);
+  const showPreview = labelOpacity > 0.15 && isShowreelHovered;
 
   const scrollToAbout = () => {
     const aboutSection = document.getElementById('about');
@@ -28,155 +77,175 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     }
   };
 
-  // Calculate logo animation based on scroll (using passed scrollProgress 0 to 1)
-  // At 0: Scale is HUGE (e.g. 30), it's black.
-  // At 1: Scale is 1, it's white.
-  // Filter transition: 0 to 0.7 staying black, 0.7 to 1 going to white
-  
-  // Custom manual interpolation for performance directly in style
-  const logoScale = Math.max(1, 30 - scrollProgress * 29);
-  // brightness: 0 is black, 1 is original (white)
-  const isBlackPhase = scrollProgress < 0.6;
-  
-  // Texts only appear when scroll is almost done
-  const textOpacity = scrollProgress > 0.8 ? 1 : 0;
-  const textTranslateX = scrollProgress > 0.8 ? 0 : -20;
-  
-  // Small logo in header must be managed globally but here we focus on the Hero Logo.
-
   return (
-    <section
-      id="hero"
-      ref={heroRef}
-      className="relative min-h-[150vh] w-full bg-[#0A0A0A]"
-    >
-      {/* Sticky container keeps everything in view while the 150vh section scrolls */}
+    <section id="hero" className="relative h-[430vh] w-full bg-black">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        
-        {/* Background Interactive Layer (Sea + Octopus) */}
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          style={{
-            zIndex: 1,
-            y: ySpring,
-            rotate: rotateSpring
-          }}
-        >
-          <div className="absolute inset-0 pointer-events-auto">
-            {/* Interactive 3D Component - Full viewport (mobile & desktop) */}
-            <div className="hidden lg:block w-full h-full">
-              <InteractiveOctopus imagePath="/octopus-purple.png" isInteractive={true} />
-            </div>
-            {/* Static image for mobile (no 3D, no movement) */}
-            <div className="lg:hidden w-full h-full flex items-center justify-center bg-[#05001a]">
-              {/* simple fallback gradient if mobile cannot load canvas */}
-            </div>
+        <div className="absolute inset-0 z-0">
+          <div className="hidden h-full w-full lg:block">
+            <InteractiveOctopus
+              imagePath="/octopus-purple.png"
+              isInteractive={true}
+              showOctopus={false}
+            />
           </div>
-        </motion.div>
+          <div className="absolute inset-0 lg:hidden bg-[#050014]" />
+        </div>
 
-        {/* Main Content */}
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
-
-        {/* Large Logo - Starts GIGANTIC and Black, shrinks to normal size and white */}
         <div
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto"
+          className="absolute inset-0 z-10 bg-black transition-opacity duration-200"
+          style={{ opacity: baseOverlayOpacity }}
+        />
+        <div
+          className="absolute inset-0 z-20"
           style={{
-            zIndex: 50,
+            opacity: atmosphereOpacity,
+            backgroundImage: 'radial-gradient(circle at center, rgba(90, 40, 160, 0.18), transparent 55%), linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.6))',
           }}
-        >
+        />
+        <div
+          className="absolute inset-0 z-20"
+          style={{
+            opacity: vignetteOpacity,
+            backgroundImage: 'radial-gradient(circle at center, transparent 46%, rgba(0, 0, 0, 0.7) 100%)',
+          }}
+        />
+
+        <div className="pointer-events-none absolute inset-0 z-30">
           <div
-            className="flex items-center justify-center transition-all duration-75"
+            className="absolute left-1/2 top-[56%]"
             style={{
-              width: '400px',
-              height: '400px',
-              transform: `scale(${logoScale})`,
+              opacity: markOpacity,
+              transform: `translate3d(-50%, calc(-50% + ${markTranslateY}vh), 0) scale(${markScale})`,
             }}
           >
             <img
-              src="/images/logo.png"
-              alt="Dubamotion"
-              className="h-48 lg:h-64 w-auto object-contain transition-all duration-300"
+              src="/images/silueta-preta-solid.png"
+              alt=""
+              className="block h-auto max-w-none select-none object-contain"
               style={{
-                filter: isBlackPhase 
-                    ? 'brightness(0)' 
-                    : 'brightness(1) drop-shadow(0 0 80px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 120px rgba(107, 33, 168, 1))',
+                width: 'max(238vw, 208vh)',
               }}
             />
           </div>
         </div>
 
-        {/* Motion Design Text - appears after scroll */}
         <div
-          className="absolute left-0 right-0 lg:right-auto lg:left-16 top-[58%] lg:top-1/2 transform -translate-y-1/2 text-center lg:text-left transition-all duration-1000 ease-out px-8"
-          style={{ 
-            zIndex: 40,
-            opacity: textOpacity,
-            transform: `translateY(-50%) translateX(${textTranslateX}px)`
+          className="pointer-events-none absolute left-1/2 top-[60%] z-50 w-[104vw] max-w-[1580px] sm:w-[80vw] lg:w-[56vw]"
+          style={{
+            opacity: octopusOpacity,
+            transform: `translate3d(calc(-50% + ${octopusOffsetX}vw), calc(-50% + ${octopusOffsetY}vh), 0) scale(${octopusScale})`,
           }}
         >
-          <h1 className="text-3xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg">
-            <span className="block">{t('hero.line1')}</span>
-            <span className="block">{t('hero.line2')}</span>
-            <span className="block text-white/80">{t('hero.line3')}</span>
-            <span className="block">{t('hero.line4')}</span>
-            <span className="block">{t('hero.line5')}</span>
-          </h1>
-        </div>
-
-        {/* Deepening Ideas Text */}
-        <div
-          className="absolute left-0 right-0 lg:left-auto lg:right-16 top-[78%] lg:top-1/2 transform -translate-y-1/2 text-center lg:text-right transition-all duration-1000 delay-100 ease-out px-8"
-          style={{ 
-            zIndex: 40,
-            opacity: textOpacity,
-            transform: `translateY(-50%) translateX(${-textTranslateX}px)`
-          }}
-        >
-          <h2 className="text-2xl lg:text-4xl font-bold text-white leading-tight drop-shadow-lg">
-            <span className="block">{t('hero.deep1')}</span>
-            <span className="block">{t('hero.deep2')}</span>
-            <span className="block">{t('hero.deep3')}</span>
-          </h2>
-        </div>
-
-        {/* Bottom Left - Dubamotion Text */}
-        <div
-          className="absolute bottom-12 left-8 lg:left-16 transition-all duration-1000 delay-200"
-          style={{ zIndex: 40, opacity: textOpacity }}
-        >
-          <span className="neon-text text-lg tracking-widest font-medium">
-            {t('hero.dubamotion')}
-          </span>
-        </div>
-
-        {/* Bottom Right - Showreel Link */}
-        <div
-          className="absolute bottom-12 right-8 lg:right-16 transition-all duration-1000 delay-300 pointer-events-auto"
-          style={{ zIndex: 40, opacity: textOpacity }}
-        >
-          <button
-            onClick={onShowreelClick}
-            className="neon-text text-lg tracking-widest font-medium hover:opacity-80 transition-opacity cursor-pointer"
-          >
-            {t('hero.showreel')}
-          </button>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div
-          className="absolute bottom-12 left-1/2 transform -translate-x-1/2 transition-all duration-1000 delay-300 pointer-events-auto"
-          style={{ zIndex: 40, opacity: textOpacity }}
-        >
-          <button
-            onClick={scrollToAbout}
-            className="scroll-indicator cursor-pointer hover:border-[#00FF88] transition-colors"
+          <img
+            src={octopusHeroImage}
+            alt=""
+            className="h-auto w-full object-contain mix-blend-screen drop-shadow-[0_40px_90px_rgba(0,0,0,0.75)]"
           />
         </div>
+
+        <div className="pointer-events-none absolute inset-0 z-40">
+          <div
+            className="absolute bottom-[19vh] left-6 md:left-12 lg:left-20"
+            style={{
+              opacity: labelOpacity,
+              transform: `translate3d(${mix(-30, 0, labelPhase)}px, ${mix(24, 0, labelPhase)}px, 0)`,
+            }}
+          >
+            <span className="neon-text text-lg font-semibold lowercase tracking-[0.24em] md:text-xl">
+              {t('hero.dubamotion')}
+            </span>
+          </div>
+
+          <div
+            className="pointer-events-auto absolute bottom-[19vh] right-6 md:right-12 lg:right-20"
+            style={{
+              opacity: labelOpacity,
+              transform: `translate3d(${mix(30, 0, labelPhase)}px, ${mix(24, 0, labelPhase)}px, 0)`,
+            }}
+          >
+            <div
+              className="relative flex flex-col items-end gap-4"
+              onMouseEnter={() => setIsShowreelHovered(true)}
+              onMouseLeave={() => setIsShowreelHovered(false)}
+              onFocusCapture={() => setIsShowreelHovered(true)}
+              onBlurCapture={() => setIsShowreelHovered(false)}
+            >
+              <div
+                className={`absolute bottom-full right-0 mb-5 aspect-video w-[220px] overflow-hidden rounded-[26px] border border-white/20 bg-black/80 shadow-[0_24px_60px_rgba(0,0,0,0.55)] backdrop-blur-sm transition-all duration-300 md:w-[320px] ${
+                  showPreview ? 'pointer-events-auto translate-y-0 scale-100 opacity-100' : 'pointer-events-none translate-y-3 scale-95 opacity-0'
+                }`}
+              >
+                <iframe
+                  src={`https://player.vimeo.com/video/${videoId}?background=1&autoplay=1&muted=1&loop=1&controls=0&title=0&byline=0&portrait=0`}
+                  className="pointer-events-none h-full w-full"
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  title="Showreel preview"
+                />
+                <button
+                  type="button"
+                  onClick={onShowreelClick}
+                  className="absolute inset-0 z-10"
+                  aria-label="Open showreel preview"
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
+              </div>
+
+              <button
+                type="button"
+                onClick={onShowreelClick}
+                className="neon-text text-lg font-semibold lowercase tracking-[0.24em] transition-opacity hover:opacity-80 md:text-xl"
+              >
+                {t('hero.showreel')}
+              </button>
+            </div>
+          </div>
+
+          <div
+            className="absolute left-6 top-[30%] md:left-12 lg:left-20"
+            style={{
+              opacity: statementOpacity,
+              transform: `translate3d(${mix(-44, 0, statementPhase)}px, ${mix(32, 0, statementPhase)}px, 0)`,
+            }}
+          >
+            <h1
+              className="hero-copy-font max-w-[14ch] text-left leading-[0.9] text-white text-[1.6rem] md:text-[2.6rem] xl:text-[3.3rem]"
+            >
+              <span className="block">{heroPrimaryLines[0]}</span>
+              <span className="block pl-[3.4ch]">{heroPrimaryLines[1]}</span>
+              <span className="block">{heroPrimaryLines[2]}</span>
+            </h1>
+          </div>
+
+          <div
+            className="absolute bottom-[18vh] right-6 text-right md:right-12 lg:right-20"
+            style={{
+              opacity: deepeningOpacity,
+              transform: `translate3d(${mix(18, 0, deepeningPhase)}px, ${mix(22, 0, deepeningPhase)}px, 0)`,
+            }}
+          >
+            <h2 className="hero-copy-font max-w-[8.5ch] text-[1.28rem] leading-[0.92] text-white md:text-[2.2rem] xl:text-[2.9rem]">
+              <span className="block">{t('hero.deep1')}</span>
+              <span className="block">{t('hero.deep2')}</span>
+              <span className="block">{t('hero.deep3')}</span>
+            </h2>
+          </div>
+
+          <div
+            className="pointer-events-auto absolute bottom-10 left-1/2 -translate-x-1/2"
+            style={{ opacity: indicatorOpacity }}
+          >
+            <button
+              type="button"
+              onClick={scrollToAbout}
+              className="scroll-indicator cursor-pointer transition-colors hover:border-[#00FF88]"
+              aria-label="Scroll to next section"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Gradient Overlay at Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" style={{ zIndex: 30 }} />
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-30 h-44 bg-gradient-to-t from-black via-black/70 to-transparent" />
     </section>
   );
 };

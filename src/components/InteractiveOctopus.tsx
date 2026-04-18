@@ -277,15 +277,19 @@ const SeaMesh = () => {
 };
 
 interface InteractiveOctopusProps {
-    imagePath: string;
+    imagePath?: string;
     isInteractive?: boolean;
     className?: string;
+    showSea?: boolean;
+    showOctopus?: boolean;
 }
 
 export default function InteractiveOctopus({
     imagePath,
     isInteractive = true,
-    className = ""
+    className = "",
+    showSea = true,
+    showOctopus = true,
 }: InteractiveOctopusProps) {
     // Track global mouse and touch position
     useEffect(() => {
@@ -332,8 +336,8 @@ export default function InteractiveOctopus({
             >
                 <ambientLight intensity={1} />
                 <Suspense fallback={null}>
-                    <SeaMesh />
-                    <OctopusMesh imagePath={imagePath} />
+                    {showSea ? <SeaMesh /> : null}
+                    {showOctopus && imagePath ? <OctopusMesh imagePath={imagePath} /> : null}
                 </Suspense>
             </Canvas>
         </div>

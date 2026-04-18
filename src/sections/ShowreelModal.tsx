@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getShowreelVideoId } from '../lib/showreel';
 
 interface ShowreelModalProps {
   isOpen: boolean;
@@ -10,17 +11,24 @@ interface ShowreelModalProps {
 const ShowreelModal = ({ isOpen, onClose }: ShowreelModalProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const { language } = useLanguage();
-  
-  const videoId = language === 'en' ? '910534861' : '875142318';
+
+  const videoId = getShowreelVideoId(language);
 
   useEffect(() => {
+    let timeoutId: number | undefined;
+
     if (isOpen) {
-      setTimeout(() => setIsVisible(true), 50);
+      timeoutId = window.setTimeout(() => setIsVisible(true), 30);
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     else {
       setIsVisible(false);
     }
+
+    return () => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    };
   }, [isOpen]);
 
   // Handle escape key
@@ -38,29 +46,32 @@ const ShowreelModal = ({ isOpen, onClose }: ShowreelModalProps) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm transition-opacity duration-500 flex items-center justify-center ${
+      className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/96 transition-opacity duration-500 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
+      onClick={onClose}
     >
-      {/* Close Button */}
       <button
+        type="button"
         onClick={onClose}
-        className="absolute top-6 right-6 md:top-8 md:right-8 z-10 text-white/70 hover:text-white transition-colors bg-black/50 p-2 rounded-full"
+        className="absolute right-5 top-5 z-20 rounded-full bg-black/55 p-3 text-white/75 transition-colors hover:text-white md:right-8 md:top-8"
         aria-label="Close"
       >
-        <X size={32} />
+        <X size={28} />
       </button>
 
-      {/* Video Container */}
-      <div className="w-full max-w-7xl aspect-video px-4 md:px-12">
+      <div
+        className="h-[100dvh] w-[100vw] bg-black"
+        onClick={(event) => event.stopPropagation()}
+      >
         <iframe
-          src={`https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0`}
-          className="w-full h-full rounded-lg shadow-2xl bg-black"
+          src={`https://player.vimeo.com/video/${videoId}?autoplay=1&muted=0&controls=1&title=0&byline=0&portrait=0`}
+          className="h-full w-full bg-black"
           frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture"
+          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
           allowFullScreen
           title="Showreel"
-        ></iframe>
+        />
       </div>
     </div>
   );

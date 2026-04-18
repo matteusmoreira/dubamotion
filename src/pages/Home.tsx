@@ -18,13 +18,21 @@ function Home() {
 
     // Track scroll progress for logo animation
     useEffect(() => {
-        const handleScroll = () => {
+        let ticking = false;
+
+        const updateScrollState = () => {
             const scrollY = window.scrollY;
             const windowHeight = window.innerHeight;
-            // Calculate progress from 0 to 1 based on scroll position
-            // Logo shrinks completely by 50% of viewport scroll
-            const progress = Math.min(scrollY / (windowHeight * 0.5), 1);
-            setScrollProgress(progress);
+            const heroSection = document.getElementById('hero');
+
+            if (heroSection) {
+                const heroStart = heroSection.offsetTop;
+                const heroScrollableDistance = Math.max(heroSection.offsetHeight - windowHeight, 1);
+                const progress = Math.min(Math.max((scrollY - heroStart) / heroScrollableDistance, 0), 1);
+                setScrollProgress(progress);
+            } else {
+                setScrollProgress(0);
+            }
 
             // Track current section
             const sections = ['hero', 'about', 'team', 'thanks', 'work', 'services', 'clients', 'contact'];
@@ -50,11 +58,25 @@ function Home() {
                     }
                 }
             }
+
+            ticking = false;
+        };
+
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateScrollState);
+                ticking = true;
+            }
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll(); // Initial call
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener('resize', handleScroll);
+        handleScroll();
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleScroll);
+        };
     }, []);
 
     // Prevent body scroll when modal is open

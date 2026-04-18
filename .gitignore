@@ -8,3 +8,6 @@ dist-ssr
 .env.*.local
 coverage
 *.local
+.playwright-cli/
+.codex-vite-5000.err
+.codex-vite-5000.log

@@ -123,9 +123,9 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             }}
           >
             <img
-              src="/images/silueta-preta-solid.png"
+              src="/images/logo-oficial-final-duba.png"
               alt=""
-              className="block h-auto max-w-none select-none object-contain"
+              className="block h-auto max-w-none select-none object-contain [filter:brightness(0)]"
               style={{
                 width: 'max(238vw, 208vh)',
               }}

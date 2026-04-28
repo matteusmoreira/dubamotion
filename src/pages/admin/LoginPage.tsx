@@ -34,7 +34,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">
-            DUDA<span className="text-[#00FF88]">.</span>
+            DUBA<span className="text-[#00FF88]">.</span>
           </h1>
           <p className="text-white/40 text-sm tracking-widest uppercase">Painel de Controle</p>
         </div>
@@ -96,7 +96,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-white/20 text-xs mt-6">
-          © {new Date().getFullYear()} Duda Motion — Todos os direitos reservados
+          © {new Date().getFullYear()} Duba Motion — Todos os direitos reservados
         </p>
       </div>
     </div>

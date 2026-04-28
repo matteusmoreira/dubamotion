@@ -57,7 +57,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className={`h-[64px] flex items-center px-5 border-b border-white/5 ${collapsed ? 'justify-center' : 'justify-between'}`}>
           {!collapsed && (
             <span className="text-white font-black text-lg uppercase tracking-tighter">
-              DUDA<span className="text-[#00FF88]">.</span>
+              DUBA<span className="text-[#00FF88]">.</span>
             </span>
           )}
           <button

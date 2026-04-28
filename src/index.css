@@ -4,6 +4,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Foco';
+  src: url('/fonts/FOCOBLACK.TTF') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Avenir Next';
+  src: url('/fonts/Avenir Next Condensed.ttc') format('truetype-collection');
+}
+
+@font-face {
+  font-family: 'Avenir Next';
+  src: url('/fonts/Avenir Next.ttc') format('truetype-collection');
+}
+
 :root {
   --neon-green: #00FF88;
   --neon-green-dark: #00CC6A;

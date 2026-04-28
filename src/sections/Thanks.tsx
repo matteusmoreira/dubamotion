@@ -75,7 +75,7 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
         </div>
         <div className="relative z-10 flex items-center justify-center h-full">
           <h2
-            className={`text-5xl lg:text-7xl font-bold green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`font-avenir font-black text-5xl lg:text-7xl green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
             thanks
@@ -94,8 +94,8 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
             <div className="space-y-4">
               {collaborators.map((person, index) => (
                 <div key={index} className="space-y-1">
-                  <h4 className="text-[#00FF88] font-semibold">{person.name}</h4>
-                  <p className="text-white/50 text-sm">{person.role}</p>
+                  <h4 className="font-avenir font-bold italic text-[#00FF88]">{person.name}</h4>
+                  <p className="font-avenir font-normal text-white/50 text-sm">{person.role}</p>
                 </div>
               ))}
             </div>
@@ -106,12 +106,12 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
             className={`transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
               }`}
           >
-            <p className="text-white/60 text-sm mb-6">
+            <p className="font-avenir font-normal text-white/60 text-sm mb-6">
               Aos clientes e parceiros que acreditaram no nosso trabalho e possibilitaram o surgimento do estúdio:
             </p>
             <div className="flex flex-wrap gap-x-8 gap-y-2">
               {clients.map((client, index) => (
-                <span key={index} className="text-[#00FF88] font-medium">
+                <span key={index} className="font-avenir font-bold italic text-[#00FF88]">
                   {client}
                 </span>
               ))}

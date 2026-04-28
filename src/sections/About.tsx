@@ -69,7 +69,7 @@ const About = ({ onNext }: AboutProps = {}) => {
           </div>
 
           <h2
-            className={`relative z-10 text-5xl font-bold text-white transition-all duration-1000 lg:text-7xl ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`relative z-10 font-avenir font-black text-5xl text-white transition-all duration-1000 lg:text-7xl ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
             {t('about.title')}
@@ -93,7 +93,7 @@ const About = ({ onNext }: AboutProps = {}) => {
                     rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                     className="flex items-center gap-4 group"
                   >
-                    <span className="text-white/70 text-lg group-hover:text-[#00FF88] transition-colors">
+                    <span className="font-avenir font-normal text-white/70 text-lg group-hover:text-[#00FF88] transition-colors">
                       {item.text}
                     </span>
                     <item.icon
@@ -111,14 +111,14 @@ const About = ({ onNext }: AboutProps = {}) => {
                 }`}
             >
               <div className="space-y-6">
-                <p className="text-white/80 text-lg leading-relaxed">
+                <p className="font-avenir text-white/80 text-lg leading-relaxed">
                   {t('about.p1')}
-                  <span className="text-white font-semibold">
+                  <span className="font-avenir font-bold text-white">
                     {t('about.highlight')}
                   </span>
                   .
                 </p>
-                <p className="text-white/60 leading-relaxed">
+                <p className="font-avenir font-normal text-white/60 leading-relaxed">
                   {t('about.p2')}
                 </p>
               </div>

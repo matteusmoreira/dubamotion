@@ -47,8 +47,8 @@ const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) =>
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
-              className={`nav-link text-[0.82rem] lowercase tracking-[0.08em] ${
-                currentSection === item.id ? 'font-medium text-white' : 'text-white/70'
+              className={`nav-link font-avenir font-medium text-[0.82rem] lowercase tracking-[0.08em] ${
+                currentSection === item.id ? 'text-white' : 'text-white/70'
               }`}
             >
               {t(`nav.${item.id}`)}

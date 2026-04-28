@@ -78,6 +78,10 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "caret-blink": "caret-blink 1.25s ease-out infinite",
       },
+      fontFamily: {
+        avenir: ['"Avenir Next"', 'sans-serif'],
+        foco: ['Foco', 'sans-serif'],
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

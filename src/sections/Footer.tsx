@@ -28,7 +28,7 @@ const Footer = () => {
                 size={18}
                 className="text-white/50 group-hover:text-[#00FF88] transition-colors"
               />
-              <span className="text-white/70 text-lg group-hover:text-[#00FF88] transition-colors">
+              <span className="font-avenir font-normal text-white/70 text-lg group-hover:text-[#00FF88] transition-colors">
                 {item.text}
               </span>
             </a>
@@ -47,7 +47,7 @@ const Footer = () => {
           </div>
 
           {/* Copyright */}
-          <p className="text-white/40 text-sm">
+          <p className="font-avenir font-normal text-white/40 text-sm">
             {t('footer.rights')}
           </p>
 
@@ -56,7 +56,7 @@ const Footer = () => {
             onClick={() => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="text-white/40 hover:text-[#00FF88] transition-colors text-sm"
+            className="font-avenir font-normal text-white/40 hover:text-[#00FF88] transition-colors text-sm"
           >
             {t('footer.backToTop')}
           </button>

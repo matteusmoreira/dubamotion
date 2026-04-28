@@ -155,7 +155,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
               transform: `translate3d(${mix(-30, 0, labelPhase)}px, ${mix(24, 0, labelPhase)}px, 0)`,
             }}
           >
-            <span className="neon-text text-lg font-semibold lowercase tracking-[0.24em] md:text-xl">
+            <span className="neon-text text-lg font-foco lowercase tracking-[0.24em] md:text-xl">
               {t('hero.dubamotion')}
             </span>
           </div>
@@ -198,7 +198,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
               <button
                 type="button"
                 onClick={onShowreelClick}
-                className="neon-text text-lg font-semibold lowercase tracking-[0.24em] transition-opacity hover:opacity-80 md:text-xl"
+                className="neon-text text-lg font-avenir font-medium lowercase tracking-[0.24em] transition-opacity hover:opacity-80 md:text-xl"
               >
                 {t('hero.showreel')}
               </button>
@@ -213,7 +213,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             }}
           >
             <h1
-              className="hero-copy-font max-w-[14ch] text-left leading-[0.9] text-white text-[1.6rem] md:text-[2.6rem] xl:text-[3.3rem]"
+              className="font-foco max-w-[14ch] text-left leading-[0.9] text-white text-[1.6rem] md:text-[2.6rem] xl:text-[3.3rem]"
             >
               <span className="block">{heroPrimaryLines[0]}</span>
               <span className="block pl-[3.4ch]">{heroPrimaryLines[1]}</span>

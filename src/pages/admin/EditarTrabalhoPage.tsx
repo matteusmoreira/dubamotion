@@ -111,11 +111,14 @@ export default function EditarTrabalhoPage() {
     if (!file.type.startsWith('image/')) return;
     setUploading(true);
     try {
-      const webpFile = await convertToWebp(file);
-      const fileName = `${Date.now()}.webp`;
+      const isGif = file.type === 'image/gif';
+      const fileToUpload = isGif ? file : await convertToWebp(file);
+      const extension = isGif ? 'gif' : 'webp';
+      const fileName = `${Date.now()}.${extension}`;
+      
       const { data } = await supabase.storage
         .from('trabalhos-capas')
-        .upload(fileName, webpFile, { upsert: true });
+        .upload(fileName, fileToUpload, { upsert: true });
 
       if (data) {
         const { data: { publicUrl } } = supabase.storage
@@ -125,7 +128,7 @@ export default function EditarTrabalhoPage() {
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao converter imagem da capa.');
+      alert('Erro ao converter/enviar imagem da capa.');
     }
     setUploading(false);
   };
@@ -135,11 +138,14 @@ export default function EditarTrabalhoPage() {
     if (!file.type.startsWith('image/')) return;
     setUploading(true);
     try {
-      const webpFile = await convertToWebp(file);
-      const fileName = `${Date.now()}_media_${Math.random().toString(36).substring(7)}.webp`;
+      const isGif = file.type === 'image/gif';
+      const fileToUpload = isGif ? file : await convertToWebp(file);
+      const extension = isGif ? 'gif' : 'webp';
+      const fileName = `${Date.now()}_media_${Math.random().toString(36).substring(7)}.${extension}`;
+      
       const { data } = await supabase.storage
         .from('trabalhos-capas')
-        .upload(fileName, webpFile, { upsert: true });
+        .upload(fileName, fileToUpload, { upsert: true });
 
       if (data) {
         const { data: { publicUrl } } = supabase.storage
@@ -154,7 +160,7 @@ export default function EditarTrabalhoPage() {
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao converter imagem para a galeria.');
+      alert('Erro ao converter/enviar imagem para a galeria.');
     }
     setUploading(false);
   };

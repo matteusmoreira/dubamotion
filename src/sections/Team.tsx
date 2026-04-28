@@ -90,7 +90,7 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
         </div>
         <div className="relative z-10 flex items-center justify-center h-full">
           <h2
-            className={`text-5xl lg:text-7xl font-bold green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`font-avenir font-black text-5xl lg:text-7xl green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
             {t('team.title')}
@@ -171,10 +171,10 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
                 </div>
 
                 {/* Member Info */}
-                <h3 className="text-[#00FF88] text-xl font-semibold mb-2">
+                <h3 className="font-avenir font-bold italic text-[#00FF88] text-xl mb-2">
                   {member.name}
                 </h3>
-                <p className="text-white/60 text-sm text-center leading-relaxed">
+                <p className="font-avenir font-normal text-white/60 text-sm text-center leading-relaxed">
                   {language === 'en' ? member.role : member.rolePt}
                 </p>
               </div>

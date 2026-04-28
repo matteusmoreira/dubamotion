@@ -107,7 +107,7 @@ const Projects = () => {
                   : 'border-white/20 text-white/70 hover:border-[#00FF88]/50 hover:text-white'
               }`}
             >
-              Modalidades
+              Todos
             </button>
             {categories.map((cat) => (
               <button
@@ -170,7 +170,7 @@ const Projects = () => {
                      <StoriesContent>
                        {filteredProjects.map((project) => (
                          <Story
-                           className="aspect-[3/4] w-[280px] lg:w-[320px] group"
+                           className="aspect-video w-[280px] md:w-[320px] lg:w-[380px] group rounded-xl"
                            key={project.id}
                            onClick={() => handleProjectClick(project.id)}
                          >
@@ -179,9 +179,9 @@ const Projects = () => {
                              alt={project.titulo}
                              className="transition-transform duration-700 group-hover:scale-105"
                            />
-                           <StoryOverlay className="bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+                           <StoryOverlay className="bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
                            <StoryAuthor>
-                             <StoryAuthorName className="text-2xl font-bold translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                             <StoryAuthorName className="text-xl lg:text-2xl font-bold translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                                {project.titulo}
                              </StoryAuthorName>
                            </StoryAuthor>

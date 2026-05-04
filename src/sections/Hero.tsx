@@ -28,6 +28,7 @@ const easeInOutCubic = (value: number) => {
 const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const { t, language } = useLanguage();
   const [isShowreelHovered, setIsShowreelHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const videoId = getShowreelVideoId(language);
   const progress = clamp(scrollProgress);
   const heroPrimaryLines = [
@@ -35,6 +36,15 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     t('hero.primary2'),
     t('hero.primary3'),
   ];
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent | MediaQueryList) => setIsMobile(e.matches);
+    handler(mql);
+    mql.addEventListener('change', handler as (e: MediaQueryListEvent) => void);
+    return () => mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void);
+  }, []);
 
   useEffect(() => {
     /* ── Watermark removal: multi-layer approach ── */
@@ -184,7 +194,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     + mix(0, 0.18, octopusDriftPhase)
     + mix(0, 0.4, deepeningPhase)
     - mix(0, 0.08, exitPhase);
-  const octopusOffsetX = mix(0, -20, octopusDriftPhase);
+  const octopusOffsetX = isMobile ? 0 : mix(0, -20, octopusDriftPhase);
   const octopusOffsetY = mix(72, 12, octopusRevealPhase)
     + mix(0, -8, octopusDriftPhase)
     + mix(0, -8, deepeningPhase)

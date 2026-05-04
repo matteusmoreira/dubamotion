@@ -37,60 +37,115 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   ];
 
   useEffect(() => {
-    // Aggressively hide Unicorn Studio watermark wherever it appears
-    const hideWatermark = () => {
-      document.querySelectorAll('a').forEach((a) => {
-        if (a.href && (a.href.includes('unicorn.studio') || a.href.includes('unicornstudio'))) {
-          a.setAttribute('style', 
-            'display:none!important;visibility:hidden!important;opacity:0!important;' +
-            'pointer-events:none!important;width:0!important;height:0!important;' +
-            'overflow:hidden!important;position:fixed!important;left:-9999px!important;' +
-            'top:-9999px!important;z-index:-99999!important;clip:rect(0,0,0,0)!important;'
-          );
+    /* ── Watermark removal: multi-layer approach ── */
+
+    // 1. Hide any anchor in the main DOM (fast path)
+    const hideAnchors = () => {
+      document.querySelectorAll<HTMLAnchorElement>(
+        'a[href*="unicorn.studio"], a[href*="unicornstudio"]'
+      ).forEach((a) => {
+        a.style.cssText =
+          'display:none!important;visibility:hidden!important;opacity:0!important;' +
+          'width:0!important;height:0!important;overflow:hidden!important;' +
+          'position:fixed!important;left:-9999px!important;top:-9999px!important;' +
+          'z-index:-99999!important;clip:rect(0,0,0,0)!important;pointer-events:none!important;';
+      });
+    };
+
+    // 2. Traverse Shadow DOM trees looking for the badge
+    const hideShadow = (root: Element | ShadowRoot) => {
+      root.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => {
+        if (a.href?.includes('unicorn.studio') || a.href?.includes('unicornstudio')) {
+          a.style.cssText = 'display:none!important;';
         }
       });
+      root.querySelectorAll('*').forEach((el) => {
+        if (el.shadowRoot) hideShadow(el.shadowRoot);
+      });
+    };
+
+    // 3. Try to access same-origin iframes
+    const hideInIframes = () => {
+      document.querySelectorAll('iframe').forEach((iframe) => {
+        try {
+          const doc = iframe.contentDocument || iframe.contentWindow?.document;
+          if (doc) {
+            doc.querySelectorAll<HTMLAnchorElement>('a[href*="unicorn.studio"]').forEach((a) => {
+              a.style.cssText = 'display:none!important;';
+            });
+          }
+        } catch { /* cross-origin – ignore */ }
+      });
+    };
+
+    // 4. Hide cross-origin iframes that serve the badge itself
+    const hideBadgeIframes = () => {
+      document.querySelectorAll('iframe').forEach((iframe) => {
+        const src = iframe.src || '';
+        if (src.includes('unicorn.studio') || src.includes('unicornstudio')) {
+          iframe.style.cssText = 'display:none!important;';
+        }
+      });
+    };
+
+    // 5. Generic nuke: hide any absolutely/fixed-positioned element at the
+    //    very bottom of the Unicorn container that contains the watermark text
+    const nukeOverlays = () => {
+      const container = document.querySelector('[data-us-project]');
+      if (!container) return;
+      container.querySelectorAll<HTMLElement>('*').forEach((el) => {
+        const style = getComputedStyle(el);
+        const txt = el.textContent?.toLowerCase() || '';
+        if (
+          (style.position === 'absolute' || style.position === 'fixed') &&
+          (txt.includes('unicorn') || txt.includes('made with'))
+        ) {
+          el.style.cssText = 'display:none!important;';
+        }
+      });
+
+      // Also walk shadow roots inside the container
+      container.querySelectorAll('*').forEach((el) => {
+        if (el.shadowRoot) hideShadow(el.shadowRoot);
+      });
+    };
+
+    const fullHide = () => {
+      hideAnchors();
+      hideInIframes();
+      hideBadgeIframes();
+      nukeOverlays();
     };
 
     const initUnicorn = () => {
       const u = (window as any).UnicornStudio;
       if (u && u.init) {
         u.init();
-        // Run hideWatermark at increasing intervals to catch late injection
-        for (let delay = 200; delay <= 5000; delay += 400) {
-          setTimeout(hideWatermark, delay);
+        // Run at increasing intervals to catch late injection
+        for (let delay = 200; delay <= 8000; delay += 500) {
+          setTimeout(fullHide, delay);
         }
       }
     };
 
     if (!document.getElementById('unicornstudio-script')) {
-      const script = document.createElement("script");
-      script.id = "unicornstudio-script";
-      script.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.9/dist/unicornStudio.umd.js";
+      const script = document.createElement('script');
+      script.id = 'unicornstudio-script';
+      script.src =
+        'https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.9/dist/unicornStudio.umd.js';
       script.onload = initUnicorn;
       document.body.appendChild(script);
     } else {
       initUnicorn();
     }
 
-    // Persistent MutationObserver on body to catch any dynamically-injected watermark
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-          if (node instanceof HTMLElement) {
-            if (node.tagName === 'A' && (node as HTMLAnchorElement).href?.includes('unicorn.studio')) {
-              hideWatermark();
-            } else if (node.querySelector?.('a[href*="unicorn.studio"]')) {
-              hideWatermark();
-            }
-          }
-        }
-      }
-    });
+    // Persistent MutationObserver – watches for any DOM mutation
+    const observer = new MutationObserver(() => fullHide());
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // Fallback interval that runs every 2 seconds for the first 30 seconds
-    const intervalId = setInterval(hideWatermark, 2000);
-    const timeoutId = setTimeout(() => clearInterval(intervalId), 30000);
+    // Fallback interval (every 1s for 60s)
+    const intervalId = setInterval(fullHide, 1000);
+    const timeoutId = setTimeout(() => clearInterval(intervalId), 60000);
 
     return () => {
       observer.disconnect();
@@ -147,7 +202,34 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     <section id="hero" className="relative h-[430vh] w-full bg-black">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <div className="absolute inset-0 z-0 bg-[#050014]">
-          <div style={{ width: '100%', height: '100%' }} data-us-project="PzMFeLsJ9KINur0tgjsW"></div>
+          <div style={{ width: '100%', height: '100%', position: 'relative' }} data-us-project="PzMFeLsJ9KINur0tgjsW"></div>
+          {/* Physical cover to hide the watermark badge at the bottom */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '300px',
+              height: '80px',
+              background: '#050014',
+              zIndex: 100000000,
+              pointerEvents: 'none',
+            }}
+          />
+          {/* Gradient blend on bottom edge */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: '50px',
+              background: 'linear-gradient(to bottom, transparent 0%, #050014 60%)',
+              zIndex: 100000000,
+              pointerEvents: 'none',
+            }}
+          />
         </div>
 
         <div

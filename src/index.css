@@ -360,8 +360,11 @@ body {
 /* ── Unicorn Studio watermark removal ── */
 [data-us-project] a[href*="unicorn.studio"],
 [data-us-project] a[href*="unicornstudio"],
-a[href*="unicorn.studio"][style*="z-index: 99999999"],
-a[href*="unicorn.studio"][style*="z-index:99999999"] {
+a[href*="unicorn.studio"],
+a[href*="unicornstudio"],
+a[href*="unicorn.studio"][style*="z-index"],
+iframe[src*="unicorn.studio"],
+iframe[src*="unicornstudio"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -372,6 +375,12 @@ a[href*="unicorn.studio"][style*="z-index:99999999"] {
   position: absolute !important;
   z-index: -9999 !important;
   clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(100%) !important;
+}
+
+/* Hide badge container div that wraps the watermark link */
+[data-us-project] > div:last-child:not(canvas):not([style*="width: 100%"]) {
+  display: none !important;
 }
 
 /* ── GPU acceleration for scroll-driven elements ── */

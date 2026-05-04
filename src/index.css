@@ -40,7 +40,8 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior removed — handled via JS for smooth navigation.
+     CSS scroll-behavior causes jank with scroll-driven animations. */
 }
 
 body {
@@ -354,4 +355,28 @@ body {
     width: 150px;
     height: 150px;
   }
+}
+
+/* ── Unicorn Studio watermark removal ── */
+[data-us-project] a[href*="unicorn.studio"],
+[data-us-project] a[href*="unicornstudio"],
+a[href*="unicorn.studio"][style*="z-index: 99999999"],
+a[href*="unicorn.studio"][style*="z-index:99999999"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  z-index: -9999 !important;
+  clip: rect(0, 0, 0, 0) !important;
+}
+
+/* ── GPU acceleration for scroll-driven elements ── */
+.sticky {
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }

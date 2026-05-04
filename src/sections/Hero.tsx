@@ -37,10 +37,28 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   ];
 
   useEffect(() => {
+    // Aggressively hide Unicorn Studio watermark wherever it appears
+    const hideWatermark = () => {
+      document.querySelectorAll('a').forEach((a) => {
+        if (a.href && (a.href.includes('unicorn.studio') || a.href.includes('unicornstudio'))) {
+          a.setAttribute('style', 
+            'display:none!important;visibility:hidden!important;opacity:0!important;' +
+            'pointer-events:none!important;width:0!important;height:0!important;' +
+            'overflow:hidden!important;position:fixed!important;left:-9999px!important;' +
+            'top:-9999px!important;z-index:-99999!important;clip:rect(0,0,0,0)!important;'
+          );
+        }
+      });
+    };
+
     const initUnicorn = () => {
       const u = (window as any).UnicornStudio;
       if (u && u.init) {
         u.init();
+        // Run hideWatermark at increasing intervals to catch late injection
+        for (let delay = 200; delay <= 5000; delay += 400) {
+          setTimeout(hideWatermark, delay);
+        }
       }
     };
 
@@ -53,6 +71,32 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     } else {
       initUnicorn();
     }
+
+    // Persistent MutationObserver on body to catch any dynamically-injected watermark
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (node instanceof HTMLElement) {
+            if (node.tagName === 'A' && (node as HTMLAnchorElement).href?.includes('unicorn.studio')) {
+              hideWatermark();
+            } else if (node.querySelector?.('a[href*="unicorn.studio"]')) {
+              hideWatermark();
+            }
+          }
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Fallback interval that runs every 2 seconds for the first 30 seconds
+    const intervalId = setInterval(hideWatermark, 2000);
+    const timeoutId = setTimeout(() => clearInterval(intervalId), 30000);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(intervalId);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const introPhase = easeInOutCubic(segment(progress, 0, 0.24));

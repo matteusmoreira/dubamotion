@@ -21,6 +21,7 @@ function Home() {
     // Track scroll progress for logo animation
     useEffect(() => {
         let ticking = false;
+        let lastSection = 'work';
 
         const updateScrollState = () => {
             const scrollY = window.scrollY;
@@ -55,7 +56,11 @@ function Home() {
                             clients: 'clients',
                             contact: 'contact',
                         };
-                        setCurrentSection(sectionMap[sectionId] || 'work');
+                        const mapped = sectionMap[sectionId] || 'work';
+                        if (mapped !== lastSection) {
+                            lastSection = mapped;
+                            setCurrentSection(mapped);
+                        }
                         break;
                     }
                 }
@@ -72,7 +77,7 @@ function Home() {
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('resize', handleScroll);
+        window.addEventListener('resize', handleScroll, { passive: true });
         handleScroll();
 
         return () => {

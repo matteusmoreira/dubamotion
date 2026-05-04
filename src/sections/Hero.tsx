@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import InteractiveOctopus from '../components/InteractiveOctopus';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getShowreelVideoId } from '../lib/showreel';
 import octopusHeroImage from '../../polvo/0112.png';
@@ -36,6 +35,25 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     t('hero.primary2'),
     t('hero.primary3'),
   ];
+
+  useEffect(() => {
+    const initUnicorn = () => {
+      const u = (window as any).UnicornStudio;
+      if (u && u.init) {
+        u.init();
+      }
+    };
+
+    if (!document.getElementById('unicornstudio-script')) {
+      const script = document.createElement("script");
+      script.id = "unicornstudio-script";
+      script.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.9/dist/unicornStudio.umd.js";
+      script.onload = initUnicorn;
+      document.body.appendChild(script);
+    } else {
+      initUnicorn();
+    }
+  }, []);
 
   const introPhase = easeInOutCubic(segment(progress, 0, 0.24));
   const labelPhase = easeOutCubic(segment(progress, 0.08, 0.22));
@@ -84,15 +102,8 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   return (
     <section id="hero" className="relative h-[430vh] w-full bg-black">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="hidden h-full w-full lg:block">
-            <InteractiveOctopus
-              imagePath="/octopus-purple.png"
-              isInteractive={true}
-              showOctopus={false}
-            />
-          </div>
-          <div className="absolute inset-0 lg:hidden bg-[#050014]" />
+        <div className="absolute inset-0 z-0 bg-[#050014]">
+          <div style={{ width: '100%', height: '100%' }} data-us-project="PzMFeLsJ9KINur0tgjsW"></div>
         </div>
 
         <div

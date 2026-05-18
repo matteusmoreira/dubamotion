@@ -72,7 +72,7 @@ const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) =>
             <img
               src="/images/logo-oficial-final-duba.png"
               alt="Dubamotion"
-              className="h-auto w-10 [filter:brightness(0)] md:w-12"
+              className="h-auto w-10 [filter:brightness(0)_invert(1)] md:w-12"
             />
           </button>
         </div>

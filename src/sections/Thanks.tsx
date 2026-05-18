@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { Warp } from "@paper-design/shaders-react";
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface ThanksProps {
   onPrev?: () => void;
 }
 
 const Thanks = ({ onPrev }: ThanksProps = {}) => {
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -29,11 +31,11 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
   }, []);
 
   const collaborators = [
-    { name: 'Amanda Lucatti', role: 'Designer redes sociais' },
-    { name: 'Dalmo Azevedo', role: 'Motion Designer Parceiro e Sound Designer do Manifesto' },
-    { name: 'Leonardo Martineli', role: 'Modelagem e textura do Polvo 3D da Marca' },
-    { name: 'Victor Santos', role: 'Redação Manifesto' },
-    { name: 'Vitor Tavares', role: 'Branding da marca e direção de arte do Manifesto' },
+    { name: 'Amanda Lucatti', role: t('thanks.roles.amanda') },
+    { name: 'Dalmo Azevedo', role: t('thanks.roles.dalmo') },
+    { name: 'Leonardo Martineli', role: t('thanks.roles.leonardo') },
+    { name: 'Victor Santos', role: t('thanks.roles.victor') },
+    { name: 'Vitor Tavares', role: t('thanks.roles.vitor') },
   ];
 
   const clients = [
@@ -78,7 +80,7 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
             className={`font-avenir font-black text-5xl lg:text-7xl green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
-            thanks
+            {t('thanks.title')}
           </h2>
         </div>
       </div>
@@ -107,7 +109,7 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
               }`}
           >
             <p className="font-avenir font-normal text-white/60 text-sm mb-6">
-              Aos clientes e parceiros que acreditaram no nosso trabalho e possibilitaram o surgimento do estúdio:
+              {t('thanks.clientsText')}
             </p>
             <div className="flex flex-wrap gap-x-8 gap-y-2">
               {clients.map((client, index) => (

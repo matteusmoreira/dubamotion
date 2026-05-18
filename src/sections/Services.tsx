@@ -28,11 +28,9 @@ const Services = () => {
   }, []);
 
   const animationServices = [
-    'services.anim.flat',
-    'services.anim.stylized',
+    'services.anim.animation2d',
     'services.anim.mixed',
     'services.anim.collage',
-    'services.anim.rigging',
     'services.anim.char',
   ];
 

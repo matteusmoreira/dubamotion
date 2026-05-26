@@ -79,8 +79,9 @@ module.exports = {
         "caret-blink": "caret-blink 1.25s ease-out infinite",
       },
       fontFamily: {
-        avenir: ['"Avenir Next"', 'sans-serif'],
+        avenir: ['Avenir', '"Avenir Next"', 'sans-serif'],
         foco: ['Foco', 'sans-serif'],
+        sans: ['Avenir', '"Avenir Next"', 'sans-serif'],
       },
     },
   },

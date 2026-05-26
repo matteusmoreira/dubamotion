@@ -90,7 +90,7 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
         </div>
         <div className="relative z-10 flex items-center justify-center h-full">
           <h2
-            className={`font-avenir font-black text-5xl lg:text-7xl green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`font-foco font-bold text-5xl lg:text-7xl green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
             {t('team.title')}

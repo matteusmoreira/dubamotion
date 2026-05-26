@@ -466,7 +466,7 @@ export default function EditarTrabalhoPage() {
 
             {/* Preview */}
             {form.capa_url && !uploading && (
-              <div className="relative mb-3 aspect-[3/4] rounded-2xl overflow-hidden border border-white/10">
+              <div className="relative mb-3 aspect-video rounded-2xl overflow-hidden border border-white/10">
                 <img src={form.capa_url} alt="Capa" className="w-full h-full object-cover" />
                 <button
                   onClick={() => setForm((f) => ({ ...f, capa_url: '' }))}

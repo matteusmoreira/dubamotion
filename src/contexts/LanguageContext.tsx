@@ -9,8 +9,29 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+// Função para detectar o idioma inicial
+const getInitialLanguage = (): Language => {
+    if (typeof window !== 'undefined') {
+        const savedLang = localStorage.getItem('user-language') as Language;
+        if (savedLang === 'pt' || savedLang === 'en') {
+            return savedLang;
+        }
+
+        const browserLang = navigator.language || (navigator as any).userLanguage;
+        if (browserLang && browserLang.startsWith('pt')) {
+            return 'pt';
+        }
+    }
+    return 'en'; // Padrão se não for português
+};
+
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-    const [language, setLanguage] = useState<Language>('pt'); // Default to Portuguese per user request implication or default
+    const [language, setLanguageState] = useState<Language>(getInitialLanguage);
+
+    const setLanguage = (lang: Language) => {
+        setLanguageState(lang);
+        localStorage.setItem('user-language', lang);
+    };
 
     const t = (key: string): string => {
         const keys = key.split('.');
@@ -41,3 +62,4 @@ export const useLanguage = () => {
     }
     return context;
 };
+

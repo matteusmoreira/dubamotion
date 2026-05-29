@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Lenis from 'lenis';
 import Header from '../sections/Header';
 import Hero from '../sections/Hero';
 import ShowreelModal from '../sections/ShowreelModal';
@@ -17,6 +18,33 @@ function Home() {
     const [carouselIndex, setCarouselIndex] = useState(0);
     const [carouselHeight, setCarouselHeight] = useState<number | null>(null);
     const carouselSlideRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+    // Initialize Lenis smooth scroll
+    useEffect(() => {
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            gestureOrientation: 'vertical',
+            smoothWheel: true,
+            wheelMultiplier: 1.0,
+            touchMultiplier: 1.5,
+            infinite: false,
+        });
+
+        let rafId: number;
+        function raf(time: number) {
+            lenis.raf(time);
+            rafId = requestAnimationFrame(raf);
+        }
+
+        rafId = requestAnimationFrame(raf);
+
+        return () => {
+            lenis.destroy();
+            cancelAnimationFrame(rafId);
+        };
+    }, []);
 
     // Track scroll progress for logo animation
     useEffect(() => {

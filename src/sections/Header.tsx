@@ -70,7 +70,7 @@ const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) =>
             aria-label="Dubamotion"
           >
             <img
-              src="/images/logo-oficial-final-duba.png"
+              src="/images/logo-oficial-final-duba.webp"
               alt="Dubamotion"
               className="h-auto w-10 [filter:brightness(0)_invert(1)] md:w-12"
             />

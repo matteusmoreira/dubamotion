@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getShowreelVideoId } from '../lib/showreel';
 import octopusHeroImage from '../../polvo/0112.png';
+import arrowIcon from '../../seta/Lootie_Seta-p-baixo_loop.svg';
+
 
 interface HeroProps {
   onShowreelClick?: () => void;
@@ -142,7 +144,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
       const script = document.createElement('script');
       script.id = 'unicornstudio-script';
       script.src =
-        'https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.9/dist/unicornStudio.umd.js';
+        'https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.12/dist/unicornStudio.umd.js';
       script.onload = initUnicorn;
       document.body.appendChild(script);
     } else {
@@ -167,6 +169,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const introPhase = easeInOutCubic(segment(progress, 0, 0.24));
   const labelPhase = easeOutCubic(segment(progress, 0.08, 0.22));
   const labelExitPhase = easeInOutCubic(segment(progress, 0.34, 0.46));
+  const labelRisePhase = easeOutCubic(segment(progress, 0.22, 0.5));
   const dockPhase = easeInOutCubic(segment(progress, 0.16, 0.36));
   const handoffPhase = easeInOutCubic(segment(progress, 0.24, 0.4));
   const statementPhase = easeOutCubic(segment(progress, 0.28, 0.48));
@@ -182,6 +185,8 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const statementOpacity = statementPhase * mix(1, 0.82, deepeningPhase) * (1 - exitPhase * 0.3);
   const deepeningOpacity = deepeningPhase * (1 - exitPhase * 0.35);
   const indicatorOpacity = clamp(labelOpacity + statementOpacity * 0.55) * (1 - exitPhase * 0.45);
+  const arrowOpacity = clamp(1 - segment(progress, 0, 0.12));
+
 
   const markRestScale = mix(1.44, 1.2, introPhase);
   const markScale = mix(markRestScale, 0.16, dockPhase);
@@ -212,21 +217,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     <section id="hero" className="relative h-[430vh] w-full bg-black">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <div className="absolute inset-0 z-0 bg-[#050014]">
-          <div style={{ width: '100%', height: '100%', position: 'relative' }} data-us-project="PzMFeLsJ9KINur0tgjsW"></div>
-          {/* Physical cover to hide the watermark badge at the bottom */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '300px',
-              height: '80px',
-              background: '#050014',
-              zIndex: 100000000,
-              pointerEvents: 'none',
-            }}
-          />
+          <div style={{ width: '100%', height: '100%', position: 'relative' }} data-us-project="VYaRP9YFvIJljrldKNPw"></div>
           {/* Gradient blend on bottom edge */}
           <div
             style={{
@@ -270,7 +261,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             }}
           >
             <img
-              src="/images/logo-oficial-final-duba.png"
+              src="/images/logo-oficial-final-duba.webp"
               alt=""
               className="block h-auto max-w-none select-none object-contain [filter:brightness(0)]"
               style={{
@@ -299,7 +290,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             className="absolute bottom-[19vh] left-6 md:left-12 lg:left-20"
             style={{
               opacity: labelOpacity,
-              transform: `translate3d(${mix(-30, 0, labelPhase)}px, ${mix(24, 0, labelPhase)}px, 0)`,
+              transform: `translate3d(${mix(-30, 0, labelPhase)}px, calc(${mix(24, 0, labelPhase)}px - ${mix(0, 160, labelRisePhase)}px), 0)`,
             }}
           >
             <span className="neon-text text-lg font-foco lowercase tracking-[0.24em] md:text-xl">
@@ -311,7 +302,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             className="pointer-events-auto absolute bottom-[19vh] right-6 md:right-12 lg:right-20"
             style={{
               opacity: labelOpacity,
-              transform: `translate3d(${mix(30, 0, labelPhase)}px, ${mix(24, 0, labelPhase)}px, 0)`,
+              transform: `translate3d(${mix(30, 0, labelPhase)}px, calc(${mix(24, 0, labelPhase)}px - ${mix(0, 160, labelRisePhase)}px), 0)`,
             }}
           >
             <div
@@ -383,14 +374,13 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
           </div>
 
           <div
-            className="pointer-events-auto absolute bottom-10 left-1/2 -translate-x-1/2"
-            style={{ opacity: indicatorOpacity }}
+            className="pointer-events-none absolute bottom-10 left-1/2 -translate-x-1/2"
+            style={{ opacity: arrowOpacity }}
           >
-            <button
-              type="button"
-              onClick={scrollToAbout}
-              className="scroll-indicator cursor-pointer transition-colors hover:border-[#00FF88]"
-              aria-label="Scroll to next section"
+            <img
+              src={arrowIcon}
+              alt="Scroll down"
+              className="h-16 w-auto"
             />
           </div>
         </div>

@@ -23,21 +23,15 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
 
   const teamMembers: TeamMember[] = [
     {
-      name: 'Julio Cesar',
-      role: 'Motion designer',
-      rolePt: 'Motion designer',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop',
-    },
-    {
       name: 'Eduardo Guimarães',
-      role: 'Founder, Animation Director, Motion Designer, Composer',
-      rolePt: 'Fundador, Diretor de animação, Motion Designer, Compositor',
+      role: 'Founder and Animation Director',
+      rolePt: 'Fundador e Diretor de Animação',
       image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop',
     },
     {
       name: 'Henrique Oliveira',
-      role: 'Colorist',
-      rolePt: 'Colorista',
+      role: 'Post-production Coordinator',
+      rolePt: 'Coordenador de pós produção',
       image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=500&fit=crop',
     },
   ];

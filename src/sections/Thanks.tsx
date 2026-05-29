@@ -40,9 +40,10 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
 
   const clients = [
     'Aldo Fabrini',
+    'André Lobato e Equipe Alfred',
     'Andre Vaccaro',
     'Fabiano Feijó',
-    'Fidel',
+    'Fidel Lombardi',
     'Marcello Coelho',
     'Paulo Aguiar',
     'Rita Theoffilo',

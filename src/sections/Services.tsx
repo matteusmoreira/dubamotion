@@ -29,8 +29,8 @@ const Services = () => {
 
   const animationServices = [
     'services.anim.animation2d',
+    'services.anim.animation3d',
     'services.anim.mixed',
-    'services.anim.collage',
     'services.anim.char',
   ];
 

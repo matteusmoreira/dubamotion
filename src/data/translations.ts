@@ -36,8 +36,8 @@ export const translations = {
             postproduction: 'post-production',
             anim: {
                 animation2d: '2D Animation',
+                animation3d: '3D Animation',
                 mixed: 'Mixed Media',
-                collage: 'Collage',
                 char: 'Character Animation',
             },
             post: {
@@ -55,7 +55,7 @@ export const translations = {
             title3: 'sailed with us',
         },
         team: {
-            title: 'team',
+            title: 'Leadership',
         },
         project: {
             back: 'Back to Projects',
@@ -122,8 +122,8 @@ export const translations = {
             postproduction: 'pós-produção',
             anim: {
                 animation2d: 'Animação 2D',
+                animation3d: 'Animação 3D',
                 mixed: 'Mixed Midia',
-                collage: 'Colagem',
                 char: 'Animação de personagem',
             },
             post: {
@@ -141,7 +141,7 @@ export const translations = {
             title3: 'conosco',
         },
         team: {
-            title: 'time',
+            title: 'Liderança',
         },
         project: {
             back: 'Voltar para Projetos',
@@ -161,7 +161,7 @@ export const translations = {
             backToTop: 'Voltar ao topo',
         },
         thanks: {
-            title: 'thanks',
+            title: 'Agradecimentos',
             roles: {
                 amanda: 'Designer redes sociais',
                 dalmo: 'Motion Designer Parceiro e Sound Designer do Manifesto',

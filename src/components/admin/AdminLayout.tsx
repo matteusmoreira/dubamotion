@@ -11,6 +11,7 @@ import {
   LogOut,
   Plus,
   ChevronDown,
+  Image,
 } from 'lucide-react';
 
 type Categoria = { id: string; nome: string; slug: string };
@@ -149,6 +150,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           >
             <Tag size={18} />
             {!collapsed && <span>Categorias</span>}
+          </Link>
+
+          {/* Logotipos */}
+          <Link
+            to="/admin/logos"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
+              isActive('/admin/logos')
+                ? 'bg-[#00FF88]/10 text-[#00FF88]'
+                : 'text-white/50 hover:text-white hover:bg-white/5'
+            } ${collapsed ? 'justify-center' : ''}`}
+            title={collapsed ? 'Logotipos' : undefined}
+          >
+            <Image size={18} />
+            {!collapsed && <span>Logotipos</span>}
           </Link>
         </nav>
 

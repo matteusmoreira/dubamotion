@@ -1,30 +1,64 @@
 import { useEffect, useRef, useState } from 'react';
 import { InfiniteSlider } from '@/components/ui/infinite-slider';
 import { useLanguage } from '../contexts/LanguageContext';
+import { supabase } from '@/lib/supabase';
 
-const clientLogos = [
-  "Abbott.png", "Artboard 1 copy 68.png", "Banco_original.png", "Bradesco.png", "Continental.png",
-  "Entrenos.png", "Ibinai.png", "Inatel.png", "Juntos-pela-zn.png", "Lexus.png",
-  "Michelin.png", "Neutrogena.png", "Next.png", "PlenaVi.png", "Puma.png",
-  "SOS_mata_atlantica.png", "Sony.png", "The_black_beef.png", "Toyota.png", "Ultragaz.png",
-  "Vedacit(1).png", "Vivo.png", "Yamaha.png", "Zul-digital.png", "acqio.png",
-  "arcos dorados.png", "betnacional.png", "bitso.png", "britania.png", "burger king.png",
-  "c6bank.png", "casas bahia.png", "clear.png", "clickbus.png", "cna.png",
-  "ctrl play.png", "darwin seguros.png", "embelleze.png", "entre nos (2).png", "estapar.png",
-  "estrela bet.png", "fifo_arts.png", "fluxo.png", "garoto.png", "hidratei.png",
-  "hook&loop.png", "infunsec.png", "itau.png", "john deere.png", "johnnie walker.png",
-  "kuat.png", "laserfast.png", "live now.png", "mary.png", "mercado livre.png",
-  "microsoft.png", "mitsubishi.png", "netshoes.png", "nissan.png", "nu bank.png",
-  "o boticario.png", "omo.png", "pagbank.png", "pubg.png", "renner.png",
-  "rexona.png", "samsung.png", "scatolove.png", "spaten.png", "stone.png",
-  "suzuki.png", "takeda.png", "tegra.png", "televisa.png", "telhanorte.png",
-  "tik tok.png", "vedacit.png", "warren.png", "yeesco.png", "youse.png", "zul digital.png"
+// Logotipos estáticos locais como fallback de segurança
+const fallbackClientLogos = [
+  "Bradesco.png", "Lexus.png", "Next.png", "Toyota.png", "Vivo.png",
+  "Yamaha.png", "c6bank.png", "casas bahia.png", "cna.png", "garoto.png",
+  "itau.png", "kuat.png", "live now.png", "mercado livre.png", "mitsubishi.png",
+  "nissan.png", "nu bank.png", "renner.png", "suzuki.png", "tik tok.png"
 ];
+
+type LogoItem = {
+  id: string;
+  nome: string;
+  url: string;
+};
 
 const Clients = () => {
   const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
+  const [logos, setLogos] = useState<LogoItem[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
+
+  // Carregar os logotipos do Supabase com fallback local
+  useEffect(() => {
+    const fetchLogos = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('logos_clientes')
+          .select('id, nome, logo_url')
+          .order('ordem');
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setLogos(data.map(item => ({
+            id: item.id,
+            nome: item.nome,
+            url: item.logo_url
+          })));
+        } else {
+          useFallback();
+        }
+      } catch (err) {
+        console.warn('Erro ao carregar logotipos do Supabase (tabela pode não ter sido criada). Usando fallback local:', err);
+        useFallback();
+      }
+    };
+
+    const useFallback = () => {
+      setLogos(fallbackClientLogos.map((filename, idx) => ({
+        id: `fallback-${idx}`,
+        nome: filename.replace(/\.[^/.]+$/, ""),
+        url: `/Logotipos/${filename}`
+      })));
+    };
+
+    fetchLogos();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -76,13 +110,13 @@ const Clients = () => {
           }`}
       >
         <div className="py-16 overflow-hidden bg-white">
-          <InfiniteSlider gap={32} duration={80} reverse className="w-full">
-            {clientLogos.map((logo, index) => (
+          <InfiniteSlider gap={48} duration={40} reverse className="w-full">
+            {logos.map((logo) => (
               <img
-                key={index}
-                src={`/Logotipos/${logo}`}
-                alt={`Cliente ${index + 1}`}
-                className="h-[80px] md:h-[100px] w-auto object-contain grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300 mx-4"
+                key={logo.id}
+                src={logo.url}
+                alt={logo.nome}
+                className="h-[80px] md:h-[100px] w-auto object-contain grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
               />
             ))}
           </InfiniteSlider>

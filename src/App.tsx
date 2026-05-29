@@ -7,6 +7,7 @@ import DashboardPage from './pages/admin/DashboardPage';
 import TrabalhosPage from './pages/admin/TrabalhosPage';
 import EditarTrabalhoPage from './pages/admin/EditarTrabalhoPage';
 import CategoriasPage from './pages/admin/CategoriasPage';
+import LogosPage from './pages/admin/LogosPage';
 import AdminLayout from './components/admin/AdminLayout';
 import { ProtectedRoute } from './components/admin/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
@@ -73,6 +74,16 @@ function App() {
               <ProtectedRoute>
                 <AdminLayout>
                   <CategoriasPage />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          {/* Admin - logotipos */}
+          <Route
+            path="/admin/logos"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <LogosPage />
                 </AdminLayout>
               </ProtectedRoute>
             }

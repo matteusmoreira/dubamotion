@@ -77,6 +77,7 @@ function App() {
                 </AdminLayout>
               </ProtectedRoute>
             }
+          />
           {/* Admin - logotipos */}
           <Route
             path="/admin/logos"

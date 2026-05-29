@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Plus, Pencil, Trash2, Check, X, Loader2, Upload, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Pencil, Trash2, Check, X, Loader2, Upload, ArrowUp, ArrowDown, Download } from 'lucide-react';
 
 type LogoCliente = {
   id: string;
@@ -12,6 +12,13 @@ type LogoCliente = {
 
 const emptyForm = { nome: '', logo_url: '' };
 
+const fallbackClientLogos = [
+  "Bradesco.png", "Lexus.png", "Next.png", "Toyota.png", "Vivo.png",
+  "Yamaha.png", "c6bank.png", "casas bahia.png", "cna.png", "garoto.png",
+  "itau.png", "kuat.png", "live now.png", "mercado livre.png", "mitsubishi.png",
+  "nissan.png", "nu bank.png", "renner.png", "suzuki.png", "tik tok.png"
+];
+
 export default function LogosPage() {
   const [logos, setLogos] = useState<LogoCliente[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,9 +27,47 @@ export default function LogosPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const importarLogosPadrao = async () => {
+    setImporting(true);
+    setError('');
+    try {
+      const novosLogos = fallbackClientLogos.map((filename, index) => {
+        const nomeFormatado = filename
+          .replace(/\.[^/.]+$/, "")
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        return {
+          nome: nomeFormatado,
+          logo_url: `/Logotipos/${filename}`,
+          ordem: index + 1
+        };
+      });
+
+      const { error: insertErr } = await supabase
+        .from('logos_clientes')
+        .insert(novosLogos);
+
+      if (insertErr) {
+        if (insertErr.code === '42P01') {
+          throw new Error('A tabela "logos_clientes" não foi encontrada no banco. Por favor, execute o script SQL disponibilizado no Supabase.');
+        }
+        throw insertErr;
+      }
+
+      await fetchLogos();
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Erro ao importar logotipos padrão.');
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const fetchLogos = async () => {
     try {
@@ -330,12 +375,48 @@ export default function LogosPage() {
           <div className="w-8 h-8 border-2 border-[#00FF88] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : logos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-48 bg-white/[0.02] border border-dashed border-white/10 rounded-2xl text-white/30 gap-3">
-          <p className="text-sm">Nenhum logotipo dinâmico cadastrado no Supabase.</p>
-          <p className="text-xs text-white/20 text-center max-w-md px-4">
-            (O site está rodando com as logos estáticas locais como fallback automático. Rodando o script SQL no seu painel e adicionando novas logos aqui, o site passa a usá-las automaticamente!)
+        <div className="flex flex-col items-center justify-center p-12 bg-white/[0.02] border border-dashed border-white/10 rounded-3xl text-center max-w-2xl mx-auto my-8">
+          <div className="w-16 h-16 bg-[#00FF88]/10 text-[#00FF88] rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(0,255,136,0.1)]">
+            <Download size={28} />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">Importar Logotipos do Site</h2>
+          <p className="text-white/40 text-sm mb-6 max-w-md">
+            Identificamos que você ainda não tem logotipos cadastrados no Supabase. Gostaria de importar automaticamente os 20 logotipos padrões que já rolam no carrossel do site para poder gerenciá-los?
           </p>
-          <button onClick={openNew} className="text-[#00FF88] text-sm hover:underline font-semibold">Adicionar o primeiro logotipo</button>
+          
+          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+            <button
+              onClick={importarLogosPadrao}
+              disabled={importing}
+              className="flex items-center justify-center gap-2 bg-[#00FF88] text-black text-sm font-bold px-6 py-3.5 rounded-xl hover:bg-[#00FF88]/90 disabled:opacity-50 transition-all shadow-[0_4px_20px_rgba(0,255,136,0.15)]"
+            >
+              {importing ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Importando...
+                </>
+              ) : (
+                <>
+                  <Download size={16} />
+                  Importar 20 Logotipos Padrão
+                </>
+              )}
+            </button>
+            <button
+              onClick={openNew}
+              disabled={importing}
+              className="flex items-center justify-center gap-2 border border-white/10 text-white hover:bg-white/[0.05] text-sm font-semibold px-6 py-3.5 rounded-xl transition-all"
+            >
+              <Plus size={16} />
+              Adicionar Manualmente
+            </button>
+          </div>
+          
+          {error && (
+            <div className="mt-6 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-xs w-full text-left whitespace-pre-line">
+              {error}
+            </div>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -161,7 +161,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             alt=""
             decoding="async"
             fetchPriority="high"
-            className="h-auto w-full object-contain"
+            className="h-auto w-full object-contain md:mix-blend-screen"
           />
         </div>
 

@@ -278,8 +278,8 @@ const createTargets = (
   height: number,
   isTouchDevice: boolean,
 ): FluidTargets => {
-  const simSize = getTargetSize(isTouchDevice ? 96 : 112, width, height);
-  const dyeSize = getTargetSize(isTouchDevice ? 420 : 560, width, height);
+  const simSize = getTargetSize(isTouchDevice ? 64 : 112, width, height);
+  const dyeSize = getTargetSize(isTouchDevice ? 256 : 560, width, height);
   const velocity = createDoubleTarget(simSize.width, simSize.height, THREE.LinearFilter);
   const dye = createDoubleTarget(dyeSize.width, dyeSize.height, THREE.LinearFilter);
   const pressure = createDoubleTarget(simSize.width, simSize.height, THREE.NearestFilter);
@@ -325,15 +325,7 @@ const FluidOceanBackground = () => {
     const container = containerRef.current;
     if (!container) return;
 
-    // On small/touch screens the native scroll thread must stay free. The
-    // static CSS ocean below preserves the visual without running dozens of
-    // WebGL simulation passes for every frame of a swipe.
-    if (
-      window.matchMedia('(max-width: 768px)').matches
-      || window.matchMedia('(hover: none), (pointer: coarse)').matches
-      || window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) return;
-
+    const isTouchDevice = window.matchMedia('(max-width: 768px), (hover: none), (pointer: coarse)').matches;
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
     let renderer: THREE.WebGLRenderer;
     try {
@@ -343,7 +335,7 @@ const FluidOceanBackground = () => {
     }
 
     renderer.setClearColor(0x0f0a16, 1);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isTouchDevice ? 1 : 1.5));
     renderer.domElement.setAttribute('aria-hidden', 'true');
     renderer.domElement.style.cssText = 'display:block;width:100%;height:100%;pointer-events:none;';
     container.appendChild(renderer.domElement);
@@ -390,8 +382,6 @@ const FluidOceanBackground = () => {
     let targets: FluidTargets | null = null;
     let animationFrame = 0;
     let isVisible = true;
-    let isScrolling = false;
-    let scrollEndTimer = 0;
     let lastFrame = performance.now();
     let lastPointerX = 0;
     let lastPointerY = 0;
@@ -410,7 +400,7 @@ const FluidOceanBackground = () => {
       if (width < 2 || height < 2) return;
       renderer.setSize(width, height, false);
       targets?.dispose();
-      targets = createTargets(width, height, !finePointer.matches);
+      targets = createTargets(width, height, isTouchDevice);
       needsSeed = true;
     };
 
@@ -458,7 +448,8 @@ const FluidOceanBackground = () => {
       pressure.swap();
       pressureMaterial.uniforms.uDivergence.value = divergence.texture;
       pressureMaterial.uniforms.texelSize.value.copy(simTexelSize);
-      for (let iteration = 0; iteration < 10; iteration += 1) {
+      const pressureIterations = isTouchDevice ? 5 : 10;
+      for (let iteration = 0; iteration < pressureIterations; iteration += 1) {
         pressureMaterial.uniforms.uPressure.value = pressure.read.texture;
         renderWith(pressureMaterial, pressure.write);
         pressure.swap();
@@ -484,19 +475,17 @@ const FluidOceanBackground = () => {
 
     const renderFrame = (now: number) => {
       animationFrame = requestAnimationFrame(renderFrame);
-      if (!isVisible || isScrolling || document.hidden || !targets) {
+      if (!isVisible || document.hidden || !targets) {
         lastFrame = now;
         return;
       }
 
-      // Keep the scroll/compositor at 60fps while the decorative fluid effect
-      // updates at a visually smooth, less expensive cadence.
-      const frameInterval = 1000 / 45;
       const elapsed = now - lastFrame;
-      if (elapsed < frameInterval) return;
+      const frameInterval = isTouchDevice ? 1000 / 30 : 0;
+      if (frameInterval && elapsed < frameInterval) return;
 
       const dt = Math.min(elapsed / 1000, 1 / 30);
-      lastFrame = now - (elapsed % frameInterval);
+      lastFrame = frameInterval ? now - (elapsed % frameInterval) : now;
       if (needsSeed) {
         seedFluid();
         needsSeed = false;
@@ -562,15 +551,6 @@ const FluidOceanBackground = () => {
       };
     };
 
-    const onScroll = () => {
-      isScrolling = true;
-      window.clearTimeout(scrollEndTimer);
-      scrollEndTimer = window.setTimeout(() => {
-        isScrolling = false;
-        lastFrame = performance.now();
-      }, 120);
-    };
-
     const resizeObserver = new ResizeObserver(resize);
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       isVisible = entry.isIntersecting;
@@ -579,7 +559,6 @@ const FluidOceanBackground = () => {
     intersectionObserver.observe(container);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerdown', onPointerDown, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true });
     resize();
     animationFrame = requestAnimationFrame(renderFrame);
 
@@ -589,8 +568,6 @@ const FluidOceanBackground = () => {
       intersectionObserver.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('scroll', onScroll);
-      window.clearTimeout(scrollEndTimer);
       targets?.dispose();
       materials.forEach((material) => material.dispose());
       geometry.dispose();

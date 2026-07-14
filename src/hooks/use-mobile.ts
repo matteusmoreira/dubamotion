@@ -1,7 +1,7 @@
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
-const REDUCED_GRAPHICS_QUERY = `(max-width: ${MOBILE_BREAKPOINT}px), (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce)`
+const REDUCED_GRAPHICS_QUERY = `(max-width: ${MOBILE_BREAKPOINT}px), (hover: none), (pointer: coarse)`
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState(() =>
@@ -34,5 +34,7 @@ export function useReducedGraphics() {
     return () => mql.removeEventListener("change", onChange)
   }, [])
 
-  return shouldReduce
+  return shouldReduce || (
+    typeof window !== "undefined" && window.matchMedia(REDUCED_GRAPHICS_QUERY).matches
+  )
 }

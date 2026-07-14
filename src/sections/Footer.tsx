@@ -15,7 +15,7 @@ const Footer = () => {
     <footer id="contact" className="w-full bg-black py-16 px-8 lg:px-16">
       <div className="max-w-6xl mx-auto">
         {/* Contact Info */}
-        <div className="flex flex-col items-start gap-4">
+        <div className="flex flex-col items-center gap-4">
           {contactInfo.map((item, index) => (
             <a
               key={index}
@@ -33,6 +33,15 @@ const Footer = () => {
               </span>
             </a>
           ))}
+        </div>
+
+        {/* Award Badge */}
+        <div className="mt-12 flex justify-center">
+          <img
+            src="/images/LeaoBronze_100px.png"
+            alt="Leão de Bronze"
+            className="h-[100px] w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+          />
         </div>
 
         {/* Bottom Bar */}

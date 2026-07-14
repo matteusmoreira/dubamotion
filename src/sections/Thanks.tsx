@@ -32,7 +32,9 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
 
   const collaborators = [
     { name: 'Amanda Lucatti', role: t('thanks.roles.amanda') },
+    { name: 'André Lobato e Equipe Alfred', role: t('thanks.roles.alfred') },
     { name: 'Dalmo Azevedo', role: t('thanks.roles.dalmo') },
+    { name: 'Higor Hatano', role: t('thanks.roles.higor') },
     { name: 'Leonardo Martineli', role: t('thanks.roles.leonardo') },
     { name: 'Victor Santos', role: t('thanks.roles.victor') },
     { name: 'Vitor Tavares', role: t('thanks.roles.vitor') },
@@ -40,10 +42,11 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
 
   const clients = [
     'Aldo Fabrini',
-    'André Lobato e Equipe Alfred',
     'Andre Vaccaro',
+    'Beatriz Partington',
     'Fabiano Feijó',
     'Fidel Lombardi',
+    'Joao Pedro Albuquerque',
     'Marcello Coelho',
     'Paulo Aguiar',
     'Rita Theoffilo',

@@ -26,13 +26,13 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
       name: 'Eduardo Guimarães',
       role: 'Founder and Animation Director',
       rolePt: 'Fundador e Diretor de Animação',
-      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop',
+      image: '/images/duba-estatico.webp',
     },
     {
       name: 'Henrique Oliveira',
       role: 'Post-production Coordinator',
       rolePt: 'Coordenador de pós produção',
-      image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=500&fit=crop',
+      image: '/images/henrique-estatico.webp',
     },
   ];
 
@@ -131,14 +131,13 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
 
           {/* Team Members Grid */}
           <div
-            className={`grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
             {teamMembers.map((member, index) => (
               <div
                 key={index}
-                className={`flex flex-col items-center transition-all duration-500 ${index === currentIndex ? 'scale-105' : 'scale-100 opacity-70'
-                  }`}
+                className="flex flex-col items-center transition-all duration-500 hover:scale-105"
               >
                 {/* Member Image */}
                 <div className="relative w-4/5 mx-auto aspect-[3/4] mb-6 overflow-hidden rounded-lg">
@@ -175,20 +174,7 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
             ))}
           </div>
 
-        {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-12">
-            {teamMembers.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${currentIndex === index
-                  ? 'bg-[#00FF88] w-6'
-                  : 'bg-white/30 hover:bg-white/50'
-                  }`}
-                aria-label={`Go to member ${index + 1}`}
-              />
-            ))}
-          </div>
+        {/* Dots Indicator removed since there are only two members shown side by side */}
         </div>
       </div>
     </section>

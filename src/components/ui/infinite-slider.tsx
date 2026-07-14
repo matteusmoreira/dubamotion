@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
-import React, { useId } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 
 type InfiniteSliderProps = {
     children: React.ReactNode;
@@ -22,10 +22,24 @@ export function InfiniteSlider({
     className,
 }: InfiniteSliderProps) {
     const isHorizontal = direction === 'horizontal';
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
     
     // Geramos um ID único estável usando useId do React para isolar os keyframes no CSS
     const rawId = useId();
     const uniqueId = `slider-${rawId.replace(/[^a-zA-Z0-9]/g, '')}`;
+
+    useEffect(() => {
+        const wrapper = wrapperRef.current;
+        if (!wrapper) return;
+
+        const observer = new IntersectionObserver(([entry]) => {
+            setIsVisible(entry.isIntersecting);
+        }, { rootMargin: '160px 0px', threshold: 0.01 });
+
+        observer.observe(wrapper);
+        return () => observer.disconnect();
+    }, []);
 
     return (
         <>
@@ -63,6 +77,7 @@ export function InfiniteSlider({
                 `}
             `}} />
             <div 
+                ref={wrapperRef}
                 className={cn('overflow-hidden w-full select-none', `${uniqueId}-wrap`, className)}
             >
                 <div
@@ -73,7 +88,8 @@ export function InfiniteSlider({
                     )}
                     style={{
                         gap: `${gap}px`,
-                        willChange: 'transform',
+                        animationPlayState: isVisible ? 'running' : 'paused',
+                        willChange: isVisible ? 'transform' : 'auto',
                     }}
                 >
                     {/* Renderizamos duas cópias idênticas para criar a transição infinita perfeita */}

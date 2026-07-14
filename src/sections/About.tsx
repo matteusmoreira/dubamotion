@@ -123,8 +123,15 @@ const About = ({ onNext }: AboutProps = {}) => {
                 </p>
               </div>
 
-              {/* Navigation Arrow */}
-              <div className="mt-12 flex justify-end">
+              {/* Navigation & Award Lion */}
+              <div className="mt-12 flex justify-between items-center">
+                <img
+                  src="/images/LeaoBronze_100px.png"
+                  alt="Leão de Bronze"
+                  loading="lazy"
+                  decoding="async"
+                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                />
                 <button
                   onClick={() => {
                     if (onNext) {

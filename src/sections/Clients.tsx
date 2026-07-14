@@ -41,15 +41,15 @@ const Clients = () => {
             url: item.logo_url
           })));
         } else {
-          useFallback();
+          applyFallback();
         }
       } catch (err) {
         console.warn('Erro ao carregar logotipos do Supabase (tabela pode não ter sido criada). Usando fallback local:', err);
-        useFallback();
+        applyFallback();
       }
     };
 
-    const useFallback = () => {
+    const applyFallback = () => {
       setLogos(fallbackClientLogos.map((filename, idx) => ({
         id: `fallback-${idx}`,
         nome: filename.replace(/\.[^/.]+$/, ""),
@@ -116,6 +116,8 @@ const Clients = () => {
                 key={logo.id}
                 src={logo.url}
                 alt={logo.nome}
+                loading="lazy"
+                decoding="async"
                 className="h-[80px] md:h-[100px] w-auto object-contain grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
               />
             ))}

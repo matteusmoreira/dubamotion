@@ -40,6 +40,8 @@ const Footer = () => {
           <img
             src="/images/LeaoBronze_100px.png"
             alt="Leão de Bronze"
+            loading="lazy"
+            decoding="async"
             className="h-[100px] w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
           />
         </div>
@@ -51,6 +53,8 @@ const Footer = () => {
             <img
               src="/images/logo.png"
               alt="Dubamotion"
+              loading="lazy"
+              decoding="async"
               className="h-10 w-auto object-contain opacity-50"
             />
           </div>

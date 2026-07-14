@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Warp } from "@paper-design/shaders-react";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import WarpTitleBackground from '../components/WarpTitleBackground';
 
 interface TeamMember {
   name: string;
@@ -13,12 +13,12 @@ interface TeamMember {
 interface TeamProps {
   onNext?: () => void;
   onPrev?: () => void;
+  animateBackground?: boolean;
 }
 
-const Team = ({ onNext, onPrev }: TeamProps = {}) => {
+const Team = ({ onNext, onPrev, animateBackground = true }: TeamProps = {}) => {
   const { t, language } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const teamMembers: TeamMember[] = [
@@ -66,20 +66,7 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
       {/* Gradient Header */}
       <div className="relative h-32 mb-16 overflow-hidden w-full">
         <div className="absolute inset-0 z-0 w-full h-full">
-          <Warp
-            style={{ height: "100%", width: "100%" }}
-            proportion={0.45}
-            softness={1}
-            distortion={0.25}
-            swirl={0.8}
-            swirlIterations={10}
-            shape="checks"
-            shapeScale={0.1}
-            scale={1}
-            rotation={0}
-            speed={1}
-            colors={["#000000", "#064e3b", "#065f46", "#047857"]}
-          />
+          <WarpTitleBackground active={isVisible && animateBackground} />
           <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
         </div>
         <div className="relative z-10 flex items-center justify-center h-full">
@@ -141,11 +128,12 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
               >
                 {/* Member Image */}
                 <div className="relative w-4/5 mx-auto aspect-[3/4] mb-6 overflow-hidden rounded-lg">
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-110"
-                    style={{
-                      backgroundImage: `url(${member.image})`,
-                    }}
+                  <img
+                    src={member.image}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 hover:scale-110"
                   />
                   {/* Purple/Green Overlay */}
                   <div

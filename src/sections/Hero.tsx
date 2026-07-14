@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getShowreelVideoId } from '../lib/showreel';
-import FluidOceanBackground from '../components/FluidOceanBackground';
-import octopusHeroImage from '../../polvo/0112.png';
+import octopusHeroImage from '../../polvo/0112.webp';
 import arrowIcon from '../../seta/Lootie_Seta-p-baixo_loop.svg';
+
+const FluidOceanBackground = lazy(() => import('../components/FluidOceanBackground'));
 
 
 interface HeroProps {
@@ -92,7 +93,9 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     <section id="hero" className="relative h-[430vh] w-full bg-black">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <div className="absolute inset-0 z-0 bg-[#050014]">
-          <FluidOceanBackground />
+          <Suspense fallback={null}>
+            <FluidOceanBackground />
+          </Suspense>
           {/* Gradient blend on bottom edge */}
           <div
             style={{
@@ -147,7 +150,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
         </div>
 
         <div
-          className="pointer-events-none absolute left-1/2 top-[60%] z-50 w-[104vw] max-w-[1580px] sm:w-[80vw] lg:w-[56vw]"
+          className="hero-octopus-glow pointer-events-none absolute left-1/2 top-[60%] z-50 w-[104vw] max-w-[1580px] sm:w-[80vw] lg:w-[56vw]"
           style={{
             opacity: octopusOpacity,
             transform: `translate3d(calc(-50% + ${octopusOffsetX}vw), calc(-50% + ${octopusOffsetY}vh), 0) scale(${octopusScale})`,
@@ -156,7 +159,9 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
           <img
             src={octopusHeroImage}
             alt=""
-            className="h-auto w-full object-contain mix-blend-screen drop-shadow-[0_40px_90px_rgba(0,0,0,0.75)]"
+            decoding="async"
+            fetchPriority="high"
+            className="h-auto w-full object-contain"
           />
         </div>
 

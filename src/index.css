@@ -357,6 +357,64 @@ body {
   }
 }
 
+.mobile-title-warp {
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 24% 50%, rgba(0, 255, 136, 0.3), transparent 34%),
+    radial-gradient(circle at 76% 45%, rgba(6, 95, 70, 0.58), transparent 38%),
+    linear-gradient(105deg, #000 0%, #032b21 48%, #000 100%);
+}
+
+.mobile-title-warp::before {
+  content: '';
+  position: absolute;
+  inset: -120% -25%;
+  z-index: -1;
+  opacity: 0.58;
+  background: conic-gradient(
+    from 120deg at 50% 50%,
+    transparent 0deg,
+    rgba(0, 255, 136, 0.44) 56deg,
+    rgba(6, 78, 59, 0.18) 126deg,
+    transparent 205deg,
+    rgba(4, 120, 87, 0.42) 286deg,
+    transparent 360deg
+  );
+  transform: translate3d(-10%, 0, 0) rotate(-8deg) scale(1.12);
+}
+
+.title-warp-active::before {
+  animation: titleWarpDrift 9s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes titleWarpDrift {
+  from {
+    transform: translate3d(-12%, -3%, 0) rotate(-8deg) scale(1.12);
+  }
+  to {
+    transform: translate3d(12%, 3%, 0) rotate(10deg) scale(1.18);
+  }
+}
+
+.mobile-neon-flow {
+  background:
+    radial-gradient(ellipse at 20% 55%, rgba(249, 103, 251, 0.2), transparent 38%),
+    radial-gradient(ellipse at 80% 35%, rgba(83, 188, 40, 0.22), transparent 42%),
+    radial-gradient(ellipse at 55% 85%, rgba(105, 88, 213, 0.2), transparent 44%),
+    #000;
+}
+
+.hero-octopus-glow {
+  background: radial-gradient(
+    ellipse at 50% 54%,
+    rgba(78, 28, 126, 0.34) 0%,
+    rgba(22, 8, 38, 0.2) 44%,
+    transparent 72%
+  );
+}
+
 /* ── Unicorn Studio watermark removal ── */
 [data-us-project] a[href*="unicorn.studio"],
 [data-us-project] a[href*="unicornstudio"],
@@ -384,10 +442,12 @@ iframe[src*="unicornstudio"] {
 }
 
 /* ── GPU acceleration for scroll-driven elements ── */
-.sticky {
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+@media (min-width: 769px) {
+  .sticky {
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
 }
 
 /* ── Lenis Smooth Scroll styles ── */

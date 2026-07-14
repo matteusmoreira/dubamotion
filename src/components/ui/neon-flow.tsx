@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { cn } from "@/lib/utils";
+import { useReducedGraphics } from '@/hooks/use-mobile';
 
 // Helper for random colors
 const randomColors = (count: number) => {
@@ -14,15 +15,41 @@ interface TubesBackgroundProps {
     enableClickInteraction?: boolean;
 }
 
+interface TubesController {
+    tubes: {
+        setColors: (colors: string[]) => void;
+        setLightsColors: (colors: string[]) => void;
+    };
+    destroy?: () => void;
+    dispose?: () => void;
+}
+
 export function TubesBackground({
     children,
     className,
     enableClickInteraction = true
 }: TubesBackgroundProps) {
+    const reduceGraphics = useReducedGraphics();
+    const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const tubesRef = useRef<any>(null);
+    const tubesRef = useRef<TubesController | null>(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const observer = new IntersectionObserver(([entry]) => {
+            setIsVisible(entry.isIntersecting);
+        }, { rootMargin: '240px 0px', threshold: 0.01 });
+
+        observer.observe(container);
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        if (reduceGraphics || !isVisible) return;
+
         let mounted = true;
         let cleanup: (() => void) | undefined;
 
@@ -32,8 +59,10 @@ export function TubesBackground({
             try {
                 // We use the specific build from the CDN as it contains the exact effect requested
                 // Using native dynamic import which works in modern browsers
-                // @ts-ignore
-                const module = await import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js');
+                // @ts-expect-error Runtime-only CDN module intentionally has no local type package.
+                const module = await import('https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js') as {
+                    default: (canvas: HTMLCanvasElement, options: object) => TubesController;
+                };
                 const TubesCursor = module.default;
 
                 if (!mounted) return;
@@ -58,8 +87,9 @@ export function TubesBackground({
 
                 cleanup = () => {
                     window.removeEventListener('resize', handleResize);
-                    // If destroy method exists, call it.
-                    // app.destroy?.();
+                    if (typeof app.destroy === 'function') app.destroy();
+                    else if (typeof app.dispose === 'function') app.dispose();
+                    tubesRef.current = null;
                 };
 
             } catch (error) {
@@ -73,10 +103,10 @@ export function TubesBackground({
             mounted = false;
             if (cleanup) cleanup();
         };
-    }, []);
+    }, [isVisible, reduceGraphics]);
 
     const handleClick = () => {
-        if (!enableClickInteraction || !tubesRef.current) return;
+        if (reduceGraphics || !isVisible || !enableClickInteraction || !tubesRef.current) return;
 
         const colors = randomColors(3);
         const lightsColors = randomColors(4);
@@ -87,14 +117,19 @@ export function TubesBackground({
 
     return (
         <div
+            ref={containerRef}
             className={cn("relative w-full h-full min-h-[400px] overflow-hidden bg-background", className)}
             onClick={handleClick}
         >
-            <canvas
-                ref={canvasRef}
-                className="absolute inset-0 w-full h-full block"
-                style={{ touchAction: 'none' }}
-            />
+            {(reduceGraphics || !isVisible) && <div className="mobile-neon-flow absolute inset-0" aria-hidden="true" />}
+            {!reduceGraphics && isVisible && (
+                <canvas
+                    ref={canvasRef}
+                    className="absolute inset-0 block h-full w-full"
+                    style={{ touchAction: 'pan-y' }}
+                    aria-hidden="true"
+                />
+            )}
 
             {/* Content Overlay */}
             <div className="relative z-10 w-full h-full pointer-events-none">

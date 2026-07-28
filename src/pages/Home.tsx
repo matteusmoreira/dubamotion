@@ -11,106 +11,153 @@ import Services from '../sections/Services';
 import Clients from '../sections/Clients';
 import Footer from '../sections/Footer';
 
-function Home() {
-    const [showreelOpen, setShowreelOpen] = useState(false);
+const sectionIds = ['hero', 'about', 'team', 'thanks', 'work', 'services', 'clients', 'contact'] as const;
+
+const sectionMap: Record<(typeof sectionIds)[number], string> = {
+    hero: 'work',
+    about: 'about',
+    team: 'about',
+    thanks: 'about',
+    work: 'work',
+    services: 'services',
+    clients: 'clients',
+    contact: 'contact',
+};
+
+const ScrollDrivenIntro = ({ onShowreelClick }: { onShowreelClick: () => void }) => {
     const [currentSection, setCurrentSection] = useState('work');
     const [scrollProgress, setScrollProgress] = useState(0);
+
+    useEffect(() => {
+        let frameId: number | null = null;
+        let heroStart = 0;
+        let heroScrollableDistance = 1;
+        let sectionBounds: Array<{ id: (typeof sectionIds)[number]; start: number; end: number }> = [];
+        let lastSection = 'work';
+
+        const elements = sectionIds
+            .map((id) => ({ id, element: document.getElementById(id) }))
+            .filter((item): item is { id: (typeof sectionIds)[number]; element: HTMLElement } => Boolean(item.element));
+
+        const measureLayout = () => {
+            const hero = document.getElementById('hero');
+            if (hero) {
+                heroStart = hero.offsetTop;
+                heroScrollableDistance = Math.max(hero.offsetHeight - window.innerHeight, 1);
+            }
+
+            sectionBounds = elements.map(({ id, element }) => ({
+                id,
+                start: element.offsetTop,
+                end: element.offsetTop + element.offsetHeight,
+            }));
+        };
+
+        const updateScrollState = () => {
+            const scrollY = window.scrollY;
+            const rawProgress = Math.min(Math.max((scrollY - heroStart) / heroScrollableDistance, 0), 1);
+            const progress = Math.round(rawProgress * 1000) / 1000;
+            setScrollProgress((current) => current === progress ? current : progress);
+
+            const scrollPosition = scrollY + window.innerHeight / 3;
+            const activeSection = sectionBounds.find(({ start, end }) => (
+                scrollPosition >= start && scrollPosition < end
+            ));
+
+            if (activeSection) {
+                const mapped = sectionMap[activeSection.id];
+                if (mapped !== lastSection) {
+                    lastSection = mapped;
+                    setCurrentSection(mapped);
+                }
+            }
+
+            frameId = null;
+        };
+
+        const scheduleUpdate = () => {
+            if (frameId === null) {
+                frameId = window.requestAnimationFrame(updateScrollState);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(() => {
+            measureLayout();
+            scheduleUpdate();
+        });
+
+        elements.forEach(({ element }) => resizeObserver.observe(element));
+        window.addEventListener('scroll', scheduleUpdate, { passive: true });
+        window.addEventListener('resize', scheduleUpdate, { passive: true });
+        measureLayout();
+        scheduleUpdate();
+
+        return () => {
+            window.removeEventListener('scroll', scheduleUpdate);
+            window.removeEventListener('resize', scheduleUpdate);
+            resizeObserver.disconnect();
+            if (frameId !== null) window.cancelAnimationFrame(frameId);
+        };
+    }, []);
+
+    return (
+        <>
+            <Header currentSection={currentSection} scrollProgress={scrollProgress} />
+            <Hero onShowreelClick={onShowreelClick} scrollProgress={scrollProgress} />
+        </>
+    );
+};
+
+function Home() {
+    const [showreelOpen, setShowreelOpen] = useState(false);
     const [carouselIndex, setCarouselIndex] = useState(0);
     const [carouselHeight, setCarouselHeight] = useState<number | null>(null);
+    const [isHorizontalCarousel, setIsHorizontalCarousel] = useState(() => window.innerWidth >= 1024);
     const carouselSlideRefs = useRef<Array<HTMLDivElement | null>>([]);
 
     // Initialize Lenis smooth scroll
     useEffect(() => {
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: 'vertical',
-            gestureOrientation: 'vertical',
-            smoothWheel: true,
-            wheelMultiplier: 1.0,
-            touchMultiplier: 1.5,
-            infinite: false,
-        });
+        const desktopPointer = window.matchMedia(
+            '(min-width: 769px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)'
+        );
+        let lenis: Lenis | null = null;
+        let rafId: number | null = null;
 
-        let rafId: number;
-        function raf(time: number) {
-            lenis.raf(time);
+        const stop = () => {
+            if (rafId !== null) cancelAnimationFrame(rafId);
+            rafId = null;
+            lenis?.destroy();
+            lenis = null;
+        };
+
+        const start = () => {
+            if (lenis) return;
+
+            lenis = new Lenis({
+                duration: 0.85,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                orientation: 'vertical',
+                gestureOrientation: 'vertical',
+                smoothWheel: true,
+                wheelMultiplier: 1.0,
+                infinite: false,
+            });
+
+            const raf = (time: number) => {
+                lenis?.raf(time);
+                rafId = requestAnimationFrame(raf);
+            };
+
             rafId = requestAnimationFrame(raf);
-        }
+        };
 
-        rafId = requestAnimationFrame(raf);
+        const sync = () => desktopPointer.matches ? start() : stop();
+        desktopPointer.addEventListener('change', sync);
+        sync();
 
         return () => {
-            lenis.destroy();
-            cancelAnimationFrame(rafId);
-        };
-    }, []);
-
-    // Track scroll progress for logo animation
-    useEffect(() => {
-        let ticking = false;
-        let lastSection = 'work';
-
-        const updateScrollState = () => {
-            const scrollY = window.scrollY;
-            const windowHeight = window.innerHeight;
-            const heroSection = document.getElementById('hero');
-
-            if (heroSection) {
-                const heroStart = heroSection.offsetTop;
-                const heroScrollableDistance = Math.max(heroSection.offsetHeight - windowHeight, 1);
-                const progress = Math.min(Math.max((scrollY - heroStart) / heroScrollableDistance, 0), 1);
-                setScrollProgress(progress);
-            } else {
-                setScrollProgress(0);
-            }
-
-            // Track current section
-            const sections = ['hero', 'about', 'team', 'thanks', 'work', 'services', 'clients', 'contact'];
-            const scrollPosition = scrollY + windowHeight / 3;
-
-            for (const sectionId of sections) {
-                const element = document.getElementById(sectionId);
-                if (element) {
-                    const { offsetTop, offsetHeight } = element;
-                    if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-                        const sectionMap: { [key: string]: string } = {
-                            hero: 'work',
-                            about: 'about',
-                            team: 'about',
-                            thanks: 'about',
-                            work: 'work',
-                            services: 'services',
-                            clients: 'clients',
-                            contact: 'contact',
-                        };
-                        const mapped = sectionMap[sectionId] || 'work';
-                        if (mapped !== lastSection) {
-                            lastSection = mapped;
-                            setCurrentSection(mapped);
-                        }
-                        break;
-                    }
-                }
-            }
-
-            ticking = false;
-        };
-
-        const handleScroll = () => {
-            if (!ticking) {
-                window.requestAnimationFrame(updateScrollState);
-                ticking = true;
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('resize', handleScroll, { passive: true });
-        handleScroll();
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('resize', handleScroll);
+            desktopPointer.removeEventListener('change', sync);
+            stop();
         };
     }, []);
 
@@ -128,7 +175,10 @@ function Home() {
 
     useEffect(() => {
         const updateCarouselHeight = () => {
-            if (window.innerWidth < 1024) {
+            const horizontalCarousel = window.innerWidth >= 1024;
+            setIsHorizontalCarousel(horizontalCarousel);
+
+            if (!horizontalCarousel) {
                 setCarouselHeight(null);
                 return;
             }
@@ -159,13 +209,9 @@ function Home() {
 
     return (
         <div className="relative bg-black min-h-screen">
-            {/* Fixed Header with small logo */}
-            <Header currentSection={currentSection} scrollProgress={scrollProgress} />
-
             {/* Main Content */}
             <main>
-                {/* Hero Section with large logo that shrinks on scroll */}
-                <Hero onShowreelClick={() => setShowreelOpen(true)} scrollProgress={scrollProgress} />
+                <ScrollDrivenIntro onShowreelClick={() => setShowreelOpen(true)} />
 
                 {/* Carousel for About, Team, Thanks on lg screens */}
                 <div 
@@ -182,8 +228,8 @@ function Home() {
                             }}
                             className="w-full lg:w-1/3 shrink-0"
                         >
-                            <About onNext={() => {
-                                if (window.innerWidth >= 1024) setCarouselIndex(1);
+                            <About animateBackground={!isHorizontalCarousel || carouselIndex === 0} onNext={() => {
+                                if (isHorizontalCarousel) setCarouselIndex(1);
                                 else document.getElementById('team')?.scrollIntoView({ behavior: 'smooth' });
                             }} />
                         </div>
@@ -194,12 +240,13 @@ function Home() {
                             className="w-full lg:w-1/3 shrink-0"
                         >
                             <Team 
+                                animateBackground={!isHorizontalCarousel || carouselIndex === 1}
                                 onNext={() => {
-                                    if (window.innerWidth >= 1024) setCarouselIndex(2);
+                                    if (isHorizontalCarousel) setCarouselIndex(2);
                                     else document.getElementById('thanks')?.scrollIntoView({ behavior: 'smooth' });
                                 }} 
                                 onPrev={() => {
-                                    if (window.innerWidth >= 1024) setCarouselIndex(0);
+                                    if (isHorizontalCarousel) setCarouselIndex(0);
                                     else document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
                                 }} 
                             />
@@ -210,8 +257,8 @@ function Home() {
                             }}
                             className="w-full lg:w-1/3 shrink-0"
                         >
-                            <Thanks onPrev={() => {
-                                if (window.innerWidth >= 1024) setCarouselIndex(1);
+                            <Thanks animateBackground={!isHorizontalCarousel || carouselIndex === 2} onPrev={() => {
+                                if (isHorizontalCarousel) setCarouselIndex(1);
                                 else document.getElementById('team')?.scrollIntoView({ behavior: 'smooth' });
                             }} />
                         </div>

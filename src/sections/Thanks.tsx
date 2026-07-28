@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
-import { Warp } from "@paper-design/shaders-react";
 import { useLanguage } from '../contexts/LanguageContext';
+import WarpTitleBackground from '../components/WarpTitleBackground';
 
 interface ThanksProps {
   onPrev?: () => void;
+  animateBackground?: boolean;
 }
 
-const Thanks = ({ onPrev }: ThanksProps = {}) => {
+const Thanks = ({ onPrev, animateBackground = true }: ThanksProps = {}) => {
   const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -32,7 +33,9 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
 
   const collaborators = [
     { name: 'Amanda Lucatti', role: t('thanks.roles.amanda') },
+    { name: 'André Lobato e Equipe Alfred', role: t('thanks.roles.alfred') },
     { name: 'Dalmo Azevedo', role: t('thanks.roles.dalmo') },
+    { name: 'Higor Hatano', role: t('thanks.roles.higor') },
     { name: 'Leonardo Martineli', role: t('thanks.roles.leonardo') },
     { name: 'Victor Santos', role: t('thanks.roles.victor') },
     { name: 'Vitor Tavares', role: t('thanks.roles.vitor') },
@@ -40,10 +43,11 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
 
   const clients = [
     'Aldo Fabrini',
-    'André Lobato e Equipe Alfred',
     'Andre Vaccaro',
+    'Beatriz Partington',
     'Fabiano Feijó',
     'Fidel Lombardi',
+    'Joao Pedro Albuquerque',
     'Marcello Coelho',
     'Paulo Aguiar',
     'Rita Theoffilo',
@@ -60,20 +64,7 @@ const Thanks = ({ onPrev }: ThanksProps = {}) => {
       {/* Gradient Header */}
       <div className="relative h-32 mb-16 overflow-hidden w-full">
         <div className="absolute inset-0 z-0 w-full h-full">
-          <Warp
-            style={{ height: "100%", width: "100%" }}
-            proportion={0.45}
-            softness={1}
-            distortion={0.25}
-            swirl={0.8}
-            swirlIterations={10}
-            shape="checks"
-            shapeScale={0.1}
-            scale={1}
-            rotation={0}
-            speed={1}
-            colors={["#000000", "#064e3b", "#065f46", "#047857"]}
-          />
+          <WarpTitleBackground active={isVisible && animateBackground} />
           <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
         </div>
         <div className="relative z-10 flex items-center justify-center h-full">

@@ -92,7 +92,7 @@ const Projects = () => {
         {/* Header with Title and Filter Tags */}
         <div className={`transition-all duration-1000 mb-12 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-               <h2 className="text-5xl lg:text-7xl font-bold text-white uppercase tracking-tighter">
+               <h2 className="text-5xl lg:text-7xl font-foco font-bold text-white uppercase tracking-tighter">
                  {t('nav.work')}
                </h2>
           </div>

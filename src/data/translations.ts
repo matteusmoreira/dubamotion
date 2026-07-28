@@ -77,8 +77,10 @@ export const translations = {
         thanks: {
             title: 'thanks',
             roles: {
+                alfred: 'Website development',
                 amanda: 'Social Media Designer',
                 dalmo: 'Partner Motion Designer and Manifesto Sound Designer',
+                higor: 'Photographer and project manager',
                 leonardo: '3D Octopus Modeling and Texturing',
                 victor: 'Manifesto Copywriting',
                 vitor: 'Brand Identity and Manifesto Art Direction',
@@ -114,10 +116,10 @@ export const translations = {
             title: 'sobre',
             p1: 'Somos um estúdio de animação 2D e pós-produção. Somos uma ',
             highlight: 'marca que potencializa narrativas',
-            p2: 'Aprofundando ideias desde 2021 e acumulando experiência há mais de uma década, somos um pequeno estúdio de animação 2D e pós-produção com ampla experiência em Digital, prontos para trazer soluções inovadoras e dar movimento às suas Narrativas e Design.',
+            p2: 'Aprofundando ideias desde 2021 e acumulando experiência há mais de uma década, somos um estúdio de animação 2D e pós-produção com ampla experiência em Digital, prontos para trazer soluções inovadoras e dar movimento às suas Narrativas e Design.',
         },
         services: {
-            title: 'o que nós fazemos',
+            title: 'O que nós fazemos',
             animation: 'Motion Design',
             postproduction: 'pós-produção',
             anim: {
@@ -138,7 +140,7 @@ export const translations = {
         clients: {
             title1: 'Clientes',
             title2: 'que já navegaram',
-            title3: 'conosco',
+            title3: 'com a gente',
         },
         team: {
             title: 'Liderança',
@@ -163,8 +165,10 @@ export const translations = {
         thanks: {
             title: 'Agradecimentos',
             roles: {
+                alfred: 'Desenvolvimento site',
                 amanda: 'Designer redes sociais',
                 dalmo: 'Motion Designer Parceiro e Sound Designer do Manifesto',
+                higor: 'Fotógrafo e gerente de projeto',
                 leonardo: 'Modelagem e textura do Polvo 3D da Marca',
                 victor: 'Redação Manifesto',
                 vitor: 'Branding da marca e direção de arte do Manifesto',

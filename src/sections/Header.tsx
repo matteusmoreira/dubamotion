@@ -37,8 +37,8 @@ const Header = ({ currentSection = 'work', scrollProgress = 0 }: HeaderProps) =>
 
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-500 ${
-        isVisible ? 'bg-black/72 py-4 backdrop-blur-md' : 'bg-transparent py-6'
+      className={`fixed left-0 right-0 top-0 z-50 transition-[background-color,padding,box-shadow] duration-500 ${
+        isVisible ? 'bg-black/90 py-4 shadow-[0_12px_32px_rgba(0,0,0,0.2)]' : 'bg-transparent py-6'
       }`}
     >
       <div className="flex w-full items-center justify-between px-8 lg:px-16">

@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Mail, Instagram, Twitter, Linkedin, Phone, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Warp } from "@paper-design/shaders-react";
+import WarpTitleBackground from '../components/WarpTitleBackground';
 
 interface AboutProps {
   onNext?: () => void;
+  animateBackground?: boolean;
 }
 
-const About = ({ onNext }: AboutProps = {}) => {
+const About = ({ onNext, animateBackground = true }: AboutProps = {}) => {
   const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -50,20 +51,7 @@ const About = ({ onNext }: AboutProps = {}) => {
         <div className="relative h-32 mb-16 flex items-center justify-center overflow-hidden w-full">
           {/* Warp Background for Title */}
           <div className="absolute inset-0 z-0 w-full h-full">
-            <Warp
-              style={{ height: "100%", width: "100%" }}
-              proportion={0.45}
-              softness={1}
-              distortion={0.25}
-              swirl={0.8}
-              swirlIterations={10}
-              shape="checks"
-              shapeScale={0.1}
-              scale={1}
-              rotation={0}
-              speed={1}
-              colors={["#000000", "#064e3b", "#065f46", "#047857"]}
-            />
+            <WarpTitleBackground active={isVisible && animateBackground} />
             {/* Optional overlay/mask if needed to blend edges or improve text contrast */}
             <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
           </div>
@@ -123,8 +111,15 @@ const About = ({ onNext }: AboutProps = {}) => {
                 </p>
               </div>
 
-              {/* Navigation Arrow */}
-              <div className="mt-12 flex justify-end">
+              {/* Navigation & Award Lion */}
+              <div className="mt-12 flex justify-between items-center">
+                <img
+                  src="/images/LeaoBronze_100px.png"
+                  alt="Leão de Bronze"
+                  loading="lazy"
+                  decoding="async"
+                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                />
                 <button
                   onClick={() => {
                     if (onNext) {

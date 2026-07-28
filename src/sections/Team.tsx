@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Warp } from "@paper-design/shaders-react";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import WarpTitleBackground from '../components/WarpTitleBackground';
 
 interface TeamMember {
   name: string;
@@ -13,12 +13,12 @@ interface TeamMember {
 interface TeamProps {
   onNext?: () => void;
   onPrev?: () => void;
+  animateBackground?: boolean;
 }
 
-const Team = ({ onNext, onPrev }: TeamProps = {}) => {
+const Team = ({ onNext, onPrev, animateBackground = true }: TeamProps = {}) => {
   const { t, language } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const teamMembers: TeamMember[] = [
@@ -26,13 +26,13 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
       name: 'Eduardo Guimarães',
       role: 'Founder and Animation Director',
       rolePt: 'Fundador e Diretor de Animação',
-      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop',
+      image: '/images/duba-estatico.webp',
     },
     {
       name: 'Henrique Oliveira',
       role: 'Post-production Coordinator',
       rolePt: 'Coordenador de pós produção',
-      image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=500&fit=crop',
+      image: '/images/henrique-estatico.webp',
     },
   ];
 
@@ -66,20 +66,7 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
       {/* Gradient Header */}
       <div className="relative h-32 mb-16 overflow-hidden w-full">
         <div className="absolute inset-0 z-0 w-full h-full">
-          <Warp
-            style={{ height: "100%", width: "100%" }}
-            proportion={0.45}
-            softness={1}
-            distortion={0.25}
-            swirl={0.8}
-            swirlIterations={10}
-            shape="checks"
-            shapeScale={0.1}
-            scale={1}
-            rotation={0}
-            speed={1}
-            colors={["#000000", "#064e3b", "#065f46", "#047857"]}
-          />
+          <WarpTitleBackground active={isVisible && animateBackground} />
           <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
         </div>
         <div className="relative z-10 flex items-center justify-center h-full">
@@ -131,22 +118,22 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
 
           {/* Team Members Grid */}
           <div
-            className={`grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
             {teamMembers.map((member, index) => (
               <div
                 key={index}
-                className={`flex flex-col items-center transition-all duration-500 ${index === currentIndex ? 'scale-105' : 'scale-100 opacity-70'
-                  }`}
+                className="flex flex-col items-center transition-all duration-500 hover:scale-105"
               >
                 {/* Member Image */}
                 <div className="relative w-4/5 mx-auto aspect-[3/4] mb-6 overflow-hidden rounded-lg">
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-110"
-                    style={{
-                      backgroundImage: `url(${member.image})`,
-                    }}
+                  <img
+                    src={member.image}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 hover:scale-110"
                   />
                   {/* Purple/Green Overlay */}
                   <div
@@ -175,20 +162,7 @@ const Team = ({ onNext, onPrev }: TeamProps = {}) => {
             ))}
           </div>
 
-        {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-12">
-            {teamMembers.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${currentIndex === index
-                  ? 'bg-[#00FF88] w-6'
-                  : 'bg-white/30 hover:bg-white/50'
-                  }`}
-                aria-label={`Go to member ${index + 1}`}
-              />
-            ))}
-          </div>
+        {/* Dots Indicator removed since there are only two members shown side by side */}
         </div>
       </div>
     </section>

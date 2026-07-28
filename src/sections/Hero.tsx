@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getShowreelVideoId } from '../lib/showreel';
-import octopusHeroImage from '../../polvo/0112.png';
+import octopusHeroImage from '../../polvo/0112.webp';
 import arrowIcon from '../../seta/Lootie_Seta-p-baixo_loop.svg';
+
+const FluidOceanBackground = lazy(() => import('../components/FluidOceanBackground'));
 
 
 interface HeroProps {
@@ -48,124 +50,6 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     return () => mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void);
   }, []);
 
-  useEffect(() => {
-    /* ── Watermark removal: multi-layer approach ── */
-
-    // 1. Hide any anchor in the main DOM (fast path)
-    const hideAnchors = () => {
-      document.querySelectorAll<HTMLAnchorElement>(
-        'a[href*="unicorn.studio"], a[href*="unicornstudio"]'
-      ).forEach((a) => {
-        a.style.cssText =
-          'display:none!important;visibility:hidden!important;opacity:0!important;' +
-          'width:0!important;height:0!important;overflow:hidden!important;' +
-          'position:fixed!important;left:-9999px!important;top:-9999px!important;' +
-          'z-index:-99999!important;clip:rect(0,0,0,0)!important;pointer-events:none!important;';
-      });
-    };
-
-    // 2. Traverse Shadow DOM trees looking for the badge
-    const hideShadow = (root: Element | ShadowRoot) => {
-      root.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => {
-        if (a.href?.includes('unicorn.studio') || a.href?.includes('unicornstudio')) {
-          a.style.cssText = 'display:none!important;';
-        }
-      });
-      root.querySelectorAll('*').forEach((el) => {
-        if (el.shadowRoot) hideShadow(el.shadowRoot);
-      });
-    };
-
-    // 3. Try to access same-origin iframes
-    const hideInIframes = () => {
-      document.querySelectorAll('iframe').forEach((iframe) => {
-        try {
-          const doc = iframe.contentDocument || iframe.contentWindow?.document;
-          if (doc) {
-            doc.querySelectorAll<HTMLAnchorElement>('a[href*="unicorn.studio"]').forEach((a) => {
-              a.style.cssText = 'display:none!important;';
-            });
-          }
-        } catch { /* cross-origin – ignore */ }
-      });
-    };
-
-    // 4. Hide cross-origin iframes that serve the badge itself
-    const hideBadgeIframes = () => {
-      document.querySelectorAll('iframe').forEach((iframe) => {
-        const src = iframe.src || '';
-        if (src.includes('unicorn.studio') || src.includes('unicornstudio')) {
-          iframe.style.cssText = 'display:none!important;';
-        }
-      });
-    };
-
-    // 5. Generic nuke: hide any absolutely/fixed-positioned element at the
-    //    very bottom of the Unicorn container that contains the watermark text
-    const nukeOverlays = () => {
-      const container = document.querySelector('[data-us-project]');
-      if (!container) return;
-      container.querySelectorAll<HTMLElement>('*').forEach((el) => {
-        const style = getComputedStyle(el);
-        const txt = el.textContent?.toLowerCase() || '';
-        if (
-          (style.position === 'absolute' || style.position === 'fixed') &&
-          (txt.includes('unicorn') || txt.includes('made with'))
-        ) {
-          el.style.cssText = 'display:none!important;';
-        }
-      });
-
-      // Also walk shadow roots inside the container
-      container.querySelectorAll('*').forEach((el) => {
-        if (el.shadowRoot) hideShadow(el.shadowRoot);
-      });
-    };
-
-    const fullHide = () => {
-      hideAnchors();
-      hideInIframes();
-      hideBadgeIframes();
-      nukeOverlays();
-    };
-
-    const initUnicorn = () => {
-      const u = (window as any).UnicornStudio;
-      if (u && u.init) {
-        u.init();
-        // Run at increasing intervals to catch late injection
-        for (let delay = 200; delay <= 8000; delay += 500) {
-          setTimeout(fullHide, delay);
-        }
-      }
-    };
-
-    if (!document.getElementById('unicornstudio-script')) {
-      const script = document.createElement('script');
-      script.id = 'unicornstudio-script';
-      script.src =
-        'https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.12/dist/unicornStudio.umd.js';
-      script.onload = initUnicorn;
-      document.body.appendChild(script);
-    } else {
-      initUnicorn();
-    }
-
-    // Persistent MutationObserver – watches for any DOM mutation
-    const observer = new MutationObserver(() => fullHide());
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // Fallback interval (every 1s for 60s)
-    const intervalId = setInterval(fullHide, 1000);
-    const timeoutId = setTimeout(() => clearInterval(intervalId), 60000);
-
-    return () => {
-      observer.disconnect();
-      clearInterval(intervalId);
-      clearTimeout(timeoutId);
-    };
-  }, []);
-
   const introPhase = easeInOutCubic(segment(progress, 0, 0.24));
   const showreelPhase = easeInOutCubic(segment(progress, 0.02, 0.15));
   const labelExitPhase = easeInOutCubic(segment(progress, 0.34, 0.46));
@@ -193,6 +77,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const statementOpacity = statementPhase * mix(1, 0.82, deepeningPhase) * (1 - exitPhase * 0.3);
   const deepeningOpacity = deepeningPhase * (1 - exitPhase * 0.35);
 
+
   const markRestScale = mix(1.44, 1.2, introPhase);
   const markScale = mix(markRestScale, 0.16, dockPhase);
   const markRestTranslateY = mix(12, 18, introPhase);
@@ -211,18 +96,13 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     - mix(0, 6, exitPhase);
   const showPreview = showreelOpacity > 0.15 && isShowreelHovered;
 
-  const scrollToAbout = () => {
-    const aboutSection = document.getElementById('about');
-    if (aboutSection) {
-      aboutSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <section id="hero" className="relative h-[430vh] w-full bg-black">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         <div className="absolute inset-0 z-0 bg-[#050014]">
-          <div style={{ width: '100%', height: '100%', position: 'relative' }} data-us-project="VYaRP9YFvIJljrldKNPw"></div>
+          <Suspense fallback={null}>
+            <FluidOceanBackground />
+          </Suspense>
           {/* Gradient blend on bottom edge */}
           <div
             style={{
@@ -277,7 +157,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
         </div>
 
         <div
-          className="pointer-events-none absolute left-1/2 top-[60%] z-50 w-[104vw] max-w-[1580px] sm:w-[80vw] lg:w-[56vw]"
+          className="hero-octopus-glow pointer-events-none absolute left-1/2 top-[60%] z-50 w-[104vw] max-w-[1580px] sm:w-[80vw] lg:w-[56vw]"
           style={{
             opacity: octopusOpacity,
             transform: `translate3d(calc(-50% + ${octopusOffsetX}vw), calc(-50% + ${octopusOffsetY}vh), 0) scale(${octopusScale})`,
@@ -286,7 +166,9 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
           <img
             src={octopusHeroImage}
             alt=""
-            className="h-auto w-full object-contain mix-blend-screen drop-shadow-[0_40px_90px_rgba(0,0,0,0.75)]"
+            decoding="async"
+            fetchPriority="high"
+            className="h-auto w-full object-contain md:mix-blend-screen"
           />
         </div>
 

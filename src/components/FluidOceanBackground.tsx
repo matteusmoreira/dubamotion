@@ -106,6 +106,7 @@ const divergenceShader = `
   precision highp float;
   uniform sampler2D uVelocity;
   uniform vec2 texelSize;
+  uniform float uOpenSideBoundaries;
   varying vec2 vUv;
   void main() {
     vec2 leftUv = vUv - vec2(texelSize.x, 0.0);
@@ -117,8 +118,8 @@ const divergenceShader = `
     float bottom = texture2D(uVelocity, bottomUv).y;
     float top = texture2D(uVelocity, topUv).y;
     vec2 center = texture2D(uVelocity, vUv).xy;
-    if (leftUv.x < 0.0) left = -center.x;
-    if (rightUv.x > 1.0) right = -center.x;
+    if (leftUv.x < 0.0) left = mix(-center.x, center.x, uOpenSideBoundaries);
+    if (rightUv.x > 1.0) right = mix(-center.x, center.x, uOpenSideBoundaries);
     if (bottomUv.y < 0.0) bottom = -center.y;
     if (topUv.y > 1.0) top = -center.y;
     gl_FragColor = vec4(0.5 * (right - left + top - bottom), 0.0, 0.0, 1.0);
@@ -173,6 +174,7 @@ const displayShader = `
   uniform sampler2D uTexture;
   uniform vec2 texelSize;
   uniform float time;
+  uniform float uPureBlack;
   varying vec2 vUv;
   void main() {
     vec3 dye = texture2D(uTexture, vUv).rgb;
@@ -184,14 +186,14 @@ const displayShader = `
     vec3 deepPurple = vec3(0.0588, 0.0392, 0.0863);
     vec3 abyss = vec3(0.010, 0.004, 0.022);
     float verticalDepth = smoothstep(0.0, 1.0, vUv.y);
-    vec3 background = mix(abyss, deepPurple, 0.42 + verticalDepth * 0.34);
+    vec3 background = mix(mix(abyss, deepPurple, 0.42 + verticalDepth * 0.34), vec3(0.0), uPureBlack);
     float caustic = sin(vUv.x * 8.0 + time * 0.13) * sin(vUv.y * 7.0 - time * 0.1);
-    background += vec3(0.045, 0.018, 0.08) * (caustic * 0.5 + 0.5) * 0.08;
+    background += vec3(0.045, 0.018, 0.08) * (caustic * 0.5 + 0.5) * 0.08 * (1.0 - uPureBlack);
     vec3 color = background + dye * 1.35 + glow * 0.72;
     color = vec3(1.0) - exp(-color * 1.18);
     color = pow(color, vec3(0.92));
     float vignette = smoothstep(0.9, 0.22, distance(vUv, vec2(0.5)));
-    color *= mix(0.46, 1.0, vignette);
+    color *= mix(mix(0.46, 1.0, vignette), 1.0, uPureBlack);
     gl_FragColor = vec4(color, 1.0);
   }
 `;
@@ -318,7 +320,17 @@ const colorAt = (time: number) => {
   return palette[index].clone().lerp(palette[nextIndex], amount).multiplyScalar(2.2);
 };
 
-const FluidOceanBackground = () => {
+interface FluidOceanBackgroundProps {
+  pureBlack?: boolean;
+  openSideBoundaries?: boolean;
+  className?: string;
+}
+
+const FluidOceanBackground = ({
+  pureBlack = false,
+  openSideBoundaries = false,
+  className = '',
+}: FluidOceanBackgroundProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -334,7 +346,7 @@ const FluidOceanBackground = () => {
       return;
     }
 
-    renderer.setClearColor(0x0f0a16, 1);
+    renderer.setClearColor(pureBlack ? 0x000000 : 0x0f0a16, 1);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isTouchDevice ? 1 : 1.5));
     renderer.domElement.setAttribute('aria-hidden', 'true');
     renderer.domElement.style.cssText = 'display:block;width:100%;height:100%;pointer-events:none;';
@@ -363,6 +375,7 @@ const FluidOceanBackground = () => {
     });
     const divergenceMaterial = makeMaterial(divergenceShader, {
       uVelocity: { value: null }, texelSize: { value: new THREE.Vector2() },
+      uOpenSideBoundaries: { value: openSideBoundaries ? 1.0 : 0.0 },
     });
     const pressureMaterial = makeMaterial(pressureShader, {
       uPressure: { value: null }, uDivergence: { value: null }, texelSize: { value: new THREE.Vector2() },
@@ -375,6 +388,7 @@ const FluidOceanBackground = () => {
     });
     const displayMaterial = makeMaterial(displayShader, {
       uTexture: { value: null }, texelSize: { value: new THREE.Vector2() }, time: { value: 0 },
+      uPureBlack: { value: pureBlack ? 1.0 : 0.0 },
     });
     const materials = [splatMaterial, advectionMaterial, curlMaterial, vorticityMaterial,
       divergenceMaterial, pressureMaterial, gradientMaterial, clearMaterial, displayMaterial];
@@ -574,15 +588,17 @@ const FluidOceanBackground = () => {
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, []);
+  }, [pureBlack, openSideBoundaries]);
 
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden bg-[#0f0a16]"
+      className={`absolute inset-0 overflow-hidden ${pureBlack ? 'bg-black' : 'bg-[#0f0a16]'} ${className}`}
       aria-hidden="true"
       style={{
-        backgroundImage: 'radial-gradient(circle at 50% 38%, rgba(107, 33, 168, 0.3), transparent 48%), linear-gradient(180deg, #0f0a16 0%, #05020c 100%)',
+        backgroundImage: pureBlack
+          ? 'none'
+          : 'radial-gradient(circle at 50% 38%, rgba(107, 33, 168, 0.3), transparent 48%), linear-gradient(180deg, #0f0a16 0%, #05020c 100%)',
       }}
     />
   );

@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { TubesBackground } from '@/components/ui/neon-flow';
+
+const FluidOceanBackground = lazy(() => import('../components/FluidOceanBackground'));
 
 const Services = () => {
   const { t } = useLanguage();
@@ -49,9 +50,11 @@ const Services = () => {
       ref={sectionRef}
       className="relative w-full bg-black py-24 overflow-hidden"
     >
-      {/* Neon Flow Background */}
+      {/* Ocean Fluid Background */}
       <div className="absolute inset-0 z-0">
-        <TubesBackground className="w-full h-full bg-black" />
+        <Suspense fallback={null}>
+          <FluidOceanBackground pureBlack={true} openSideBoundaries={true} />
+        </Suspense>
       </div>
 
       {/* Content */}

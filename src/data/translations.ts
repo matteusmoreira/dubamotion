@@ -26,9 +26,9 @@ export const translations = {
         },
         about: {
             title: 'about',
-            p1: 'We are a 2D animation and post-production studio. We are a ',
+            p1: 'We are a Motion Design and post-production studio. We are a ',
             highlight: 'brand that enhances narratives',
-            p2: 'Deepening ideas since 2021 and accumulating experience for more than a decade, we are a small motion design and post production studio with extensive experience in Digital, ready to bring innovative solutions and give movement to your Narratives and Design.',
+            p2: 'Deepening ideas since 2021 and accumulating experience for more than a decade, we are a studio with extensive experience in Advertising and Digital. A trajectory that has passed through major market players, such as Meta and Google, and major advertising agencies like BETC and Africa Creative, participating in internationally recognized projects, including two Bronze Lions at Cannes Lions. We are ready to bring innovative solutions and give movement to your Narratives and Design.',
         },
         services: {
             title: 'what we do',
@@ -114,9 +114,9 @@ export const translations = {
         },
         about: {
             title: 'sobre',
-            p1: 'Somos um estúdio de animação 2D e pós-produção. Somos uma ',
+            p1: 'Somos um estúdio de Motion Design e pós produção. Somos uma ',
             highlight: 'marca que potencializa narrativas',
-            p2: 'Aprofundando ideias desde 2021 e acumulando experiência há mais de uma década, somos um estúdio de animação 2D e pós-produção com ampla experiência em Digital, prontos para trazer soluções inovadoras e dar movimento às suas Narrativas e Design.',
+            p2: 'Aprofundando ideias desde 2021 e acumulando experiência há mais de uma década, somos um estúdio com ampla experiência em Publicidade e Digital. Uma trajetória que passou por grandes players do mercado, como Meta e Google, e grandes agências publicitárias como BETC e Africa Creative, participando de projetos reconhecidos internacionalmente, incluindo dois Leões de Bronze em Cannes Lions. Estamos prontos para trazer soluções inovadoras e dar movimento às suas Narrativas e Design.',
         },
         services: {
             title: 'O que nós fazemos',

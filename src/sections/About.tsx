@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Mail, Instagram, Twitter, Linkedin, Phone, ChevronRight } from 'lucide-react';
+import { Mail, Instagram, Twitter, Linkedin, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import WarpTitleBackground from '../components/WarpTitleBackground';
+import WhatsAppIcon from '../components/WhatsAppIcon';
 
 interface AboutProps {
   onNext?: () => void;
@@ -36,7 +37,7 @@ const About = ({ onNext, animateBackground = true }: AboutProps = {}) => {
     { icon: Instagram, text: '@dubamotion', href: 'https://instagram.com/dubamotion' },
     { icon: Twitter, text: '/dubamotion', href: 'https://twitter.com/dubamotion' },
     { icon: Linkedin, text: '/dubamotion', href: 'https://linkedin.com/company/dubamotion' },
-    { icon: Phone, text: '55 (11) 9.8754-0457', href: 'https://wa.me/5511987540457' },
+    { icon: WhatsAppIcon, text: '55 (11) 9.8754-0457', href: 'https://wa.me/5511987540457' },
   ];
 
   return (
@@ -111,15 +112,8 @@ const About = ({ onNext, animateBackground = true }: AboutProps = {}) => {
                 </p>
               </div>
 
-              {/* Navigation & Award Lion */}
-              <div className="mt-12 flex justify-between items-center">
-                <img
-                  src="/images/LeaoBronze_100px.png"
-                  alt="Leão de Bronze"
-                  loading="lazy"
-                  decoding="async"
-                  className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-                />
+              {/* Navigation */}
+              <div className="mt-12 flex justify-end items-center">
                 <button
                   onClick={() => {
                     if (onNext) {

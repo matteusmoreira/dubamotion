@@ -1,5 +1,6 @@
-import { Mail, Instagram, Twitter, Linkedin, Phone } from 'lucide-react';
+import { Mail, Instagram, Twitter, Linkedin } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import WhatsAppIcon from '../components/WhatsAppIcon';
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -8,7 +9,7 @@ const Footer = () => {
     { icon: Instagram, text: '@dubamotion', href: 'https://instagram.com/dubamotion' },
     { icon: Twitter, text: '/dubamotion', href: 'https://twitter.com/dubamotion' },
     { icon: Linkedin, text: '/dubamotion', href: 'https://linkedin.com/company/dubamotion' },
-    { icon: Phone, text: '55 (11) 9.8754-0457', href: 'https://wa.me/5511987540457' },
+    { icon: WhatsAppIcon, text: '55 (11) 9.8754-0457', href: 'https://wa.me/5511987540457' },
   ];
 
   return (
@@ -33,17 +34,6 @@ const Footer = () => {
               </span>
             </a>
           ))}
-        </div>
-
-        {/* Award Badge */}
-        <div className="mt-12 flex justify-center">
-          <img
-            src="/images/LeaoBronze_100px.png"
-            alt="Leão de Bronze"
-            loading="lazy"
-            decoding="async"
-            className="h-[100px] w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-          />
         </div>
 
         {/* Bottom Bar */}

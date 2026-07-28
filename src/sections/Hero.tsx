@@ -167,9 +167,8 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   }, []);
 
   const introPhase = easeInOutCubic(segment(progress, 0, 0.24));
-  const labelPhase = easeOutCubic(segment(progress, 0.08, 0.22));
+  const showreelPhase = easeInOutCubic(segment(progress, 0.02, 0.15));
   const labelExitPhase = easeInOutCubic(segment(progress, 0.34, 0.46));
-  const labelRisePhase = easeOutCubic(segment(progress, 0.22, 0.5));
   const dockPhase = easeInOutCubic(segment(progress, 0.16, 0.36));
   const handoffPhase = easeInOutCubic(segment(progress, 0.24, 0.4));
   const statementPhase = easeOutCubic(segment(progress, 0.28, 0.48));
@@ -181,12 +180,18 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const baseOverlayOpacity = mix(0.04, 0.18, deepeningPhase);
   const atmosphereOpacity = mix(0.12, 0.74, statementPhase);
   const vignetteOpacity = mix(0.12, 0.48, deepeningPhase);
-  const labelOpacity = labelPhase * (1 - labelExitPhase);
+  
+  // Dubamotion está presente desde o início do site e sai na labelExitPhase
+  const dubamotionOpacity = 1 * (1 - labelExitPhase);
+
+  // Showreel entra no 1º scroll substituindo a setinha e sai na labelExitPhase
+  const showreelOpacity = showreelPhase * (1 - labelExitPhase);
+
+  // Setinha no lado direito: presente no início, desaparece no 1º scroll quando o Showreel entra
+  const arrowOpacity = (1 - showreelPhase) * (1 - labelExitPhase);
+
   const statementOpacity = statementPhase * mix(1, 0.82, deepeningPhase) * (1 - exitPhase * 0.3);
   const deepeningOpacity = deepeningPhase * (1 - exitPhase * 0.35);
-  const indicatorOpacity = clamp(labelOpacity + statementOpacity * 0.55) * (1 - exitPhase * 0.45);
-  const arrowOpacity = clamp(1 - segment(progress, 0, 0.12));
-
 
   const markRestScale = mix(1.44, 1.2, introPhase);
   const markScale = mix(markRestScale, 0.16, dockPhase);
@@ -204,7 +209,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
     + mix(0, -8, octopusDriftPhase)
     + mix(0, -8, deepeningPhase)
     - mix(0, 6, exitPhase);
-  const showPreview = labelOpacity > 0.15 && isShowreelHovered;
+  const showPreview = showreelOpacity > 0.15 && isShowreelHovered;
 
   const scrollToAbout = () => {
     const aboutSection = document.getElementById('about');
@@ -286,11 +291,12 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
         </div>
 
         <div className="pointer-events-none absolute inset-0 z-40">
+          {/* LADO ESQUERDO: dubamotion (presente desde o início) */}
           <div
             className="absolute bottom-[19vh] left-6 md:left-12 lg:left-20"
             style={{
-              opacity: labelOpacity,
-              transform: `translate3d(${mix(-30, 0, labelPhase)}px, calc(${mix(24, 0, labelPhase)}px - ${mix(0, 160, labelRisePhase)}px), 0)`,
+              opacity: dubamotionOpacity,
+              transform: `translate3d(0px, calc(0px - ${mix(0, 68, dockPhase)}vh), 0)`,
             }}
           >
             <span className="neon-text text-lg font-foco lowercase tracking-[0.24em] md:text-xl">
@@ -298,48 +304,73 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             </span>
           </div>
 
+          {/* LADO DIREITO: Setinha (no início) -> substituída por Showreel (no 1º scroll), ambos sobem no 2º scroll */}
           <div
-            className="pointer-events-auto absolute bottom-[19vh] right-6 md:right-12 lg:right-20"
+            className="absolute bottom-[19vh] right-6 md:right-12 lg:right-20 flex flex-col items-end"
             style={{
-              opacity: labelOpacity,
-              transform: `translate3d(${mix(30, 0, labelPhase)}px, calc(${mix(24, 0, labelPhase)}px - ${mix(0, 160, labelRisePhase)}px), 0)`,
+              transform: `translate3d(0px, calc(0px - ${mix(0, 68, dockPhase)}vh), 0)`,
             }}
           >
-            <div
-              className="relative flex flex-col items-end gap-4"
-              onMouseEnter={() => setIsShowreelHovered(true)}
-              onMouseLeave={() => setIsShowreelHovered(false)}
-              onFocusCapture={() => setIsShowreelHovered(true)}
-              onBlurCapture={() => setIsShowreelHovered(false)}
-            >
+            <div className="relative flex flex-col items-end justify-center min-h-[32px]">
+              {/* Setinha (no canto direito desde o início; desaparece no 1º scroll) */}
+              {arrowOpacity > 0.001 && (
+                <div
+                  className="pointer-events-none absolute bottom-0 right-0 flex items-center justify-end"
+                  style={{
+                    opacity: arrowOpacity,
+                    transform: `scale(${mix(1, 0.85, showreelPhase)})`,
+                  }}
+                >
+                  <img
+                    src={arrowIcon}
+                    alt="Scroll down"
+                    className="h-10 w-auto md:h-12"
+                  />
+                </div>
+              )}
+
+              {/* Showreel (substitui a setinha no 1º scroll) */}
               <div
-                className={`absolute bottom-full right-0 mb-5 aspect-video w-[220px] overflow-hidden rounded-[26px] border border-white/20 bg-black/80 shadow-[0_24px_60px_rgba(0,0,0,0.55)] backdrop-blur-sm transition-all duration-300 md:w-[320px] ${
-                  showPreview ? 'pointer-events-auto translate-y-0 scale-100 opacity-100' : 'pointer-events-none translate-y-3 scale-95 opacity-0'
-                }`}
+                className="relative flex flex-col items-end gap-4"
+                style={{
+                  opacity: showreelOpacity,
+                  transform: `translate3d(${mix(20, 0, showreelPhase)}px, 0, 0)`,
+                  pointerEvents: showreelOpacity > 0.5 ? 'auto' : 'none',
+                }}
+                onMouseEnter={() => setIsShowreelHovered(true)}
+                onMouseLeave={() => setIsShowreelHovered(false)}
+                onFocusCapture={() => setIsShowreelHovered(true)}
+                onBlurCapture={() => setIsShowreelHovered(false)}
               >
-                <iframe
-                  src={`https://player.vimeo.com/video/${videoId}?background=1&autoplay=1&muted=1&loop=1&controls=0&title=0&byline=0&portrait=0`}
-                  className="pointer-events-none h-full w-full"
-                  frameBorder="0"
-                  allow="autoplay; fullscreen; picture-in-picture"
-                  title="Showreel preview"
-                />
+                <div
+                  className={`absolute bottom-full right-0 mb-5 aspect-video w-[220px] overflow-hidden rounded-[26px] border border-white/20 bg-black/80 shadow-[0_24px_60px_rgba(0,0,0,0.55)] backdrop-blur-sm transition-all duration-300 md:w-[320px] ${
+                    showPreview ? 'pointer-events-auto translate-y-0 scale-100 opacity-100' : 'pointer-events-none translate-y-3 scale-95 opacity-0'
+                  }`}
+                >
+                  <iframe
+                    src={`https://player.vimeo.com/video/${videoId}?background=1&autoplay=1&muted=1&loop=1&controls=0&title=0&byline=0&portrait=0`}
+                    className="pointer-events-none h-full w-full"
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    title="Showreel preview"
+                  />
+                  <button
+                    type="button"
+                    onClick={onShowreelClick}
+                    className="absolute inset-0 z-10"
+                    aria-label="Open showreel preview"
+                  />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
+                </div>
+
                 <button
                   type="button"
                   onClick={onShowreelClick}
-                  className="absolute inset-0 z-10"
-                  aria-label="Open showreel preview"
-                />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
+                  className="neon-text text-lg font-avenir font-medium lowercase tracking-[0.24em] transition-opacity hover:opacity-80 md:text-xl"
+                >
+                  {t('hero.showreel')}
+                </button>
               </div>
-
-              <button
-                type="button"
-                onClick={onShowreelClick}
-                className="neon-text text-lg font-avenir font-medium lowercase tracking-[0.24em] transition-opacity hover:opacity-80 md:text-xl"
-              >
-                {t('hero.showreel')}
-              </button>
             </div>
           </div>
 

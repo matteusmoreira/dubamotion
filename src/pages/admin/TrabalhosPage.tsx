@@ -121,7 +121,7 @@ export default function TrabalhosPage() {
               }`}
             >
               {/* Imagem de capa */}
-              <div className="aspect-video relative bg-white/5">
+              <div className="aspect-square relative bg-white/5">
                 {trabalho.capa_url ? (
                   <img
                     src={trabalho.capa_url}

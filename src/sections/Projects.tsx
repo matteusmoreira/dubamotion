@@ -170,7 +170,7 @@ const Projects = () => {
                      <StoriesContent>
                        {filteredProjects.map((project) => (
                          <Story
-                           className="aspect-video w-[280px] md:w-[320px] lg:w-[380px] group rounded-xl"
+                           className="aspect-square w-[280px] md:w-[320px] lg:w-[380px] group rounded-xl"
                            key={project.id}
                            onClick={() => handleProjectClick(project.id)}
                          >

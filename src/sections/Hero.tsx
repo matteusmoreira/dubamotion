@@ -82,7 +82,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const markScale = mix(markRestScale, 0.16, dockPhase);
   const markRestTranslateY = mix(12, 18, introPhase);
   const markTranslateY = mix(markRestTranslateY, -35, dockPhase);
-  const markOpacity = mix(1, 0.06, handoffPhase) * (1 - exitPhase * 0.2);
+  const markOpacity = mix(1, 0, handoffPhase);
 
   const octopusOpacity = octopusRevealPhase * (1 - exitPhase * 0.18);
   const octopusScale = mix(0.9, 1.08, octopusRevealPhase)

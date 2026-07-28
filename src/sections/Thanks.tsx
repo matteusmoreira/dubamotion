@@ -79,42 +79,8 @@ const Thanks = ({ onPrev, animateBackground = true }: ThanksProps = {}) => {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-8 lg:px-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* Left Column - Collaborators */}
-          <div
-            className={`transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
-              }`}
-          >
-            <div className="space-y-4">
-              {collaborators.map((person, index) => (
-                <div key={index} className="space-y-1">
-                  <h4 className="font-avenir font-bold italic text-[#00FF88]">{person.name}</h4>
-                  <p className="font-avenir font-normal text-white/50 text-sm">{person.role}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Column - Clients */}
-          <div
-            className={`transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
-              }`}
-          >
-            <p className="font-avenir font-normal text-white/60 text-sm mb-6">
-              {t('thanks.clientsText')}
-            </p>
-            <div className="flex flex-wrap gap-x-8 gap-y-2">
-              {clients.map((client, index) => (
-                <span key={index} className="font-avenir font-bold italic text-[#00FF88]">
-                  {client}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Arrow */}
-        <div className="mt-16 flex justify-start">
+        <div className="relative">
+          {/* Navigation Arrow */}
           <button
             onClick={() => {
               if (onPrev) {
@@ -126,11 +92,45 @@ const Thanks = ({ onPrev, animateBackground = true }: ThanksProps = {}) => {
                 }
               }
             }}
-            className="text-white/50 hover:text-[#00FF88] transition-colors"
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 lg:-translate-x-16 z-10 text-white/50 hover:text-[#00FF88] transition-colors"
             aria-label="Previous section"
           >
-            <ChevronLeft size={32} />
+            <ChevronLeft size={40} />
           </button>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            {/* Left Column - Collaborators */}
+            <div
+              className={`transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                }`}
+            >
+              <div className="space-y-4">
+                {collaborators.map((person, index) => (
+                  <div key={index} className="space-y-1">
+                    <h4 className="font-avenir font-bold italic text-[#00FF88]">{person.name}</h4>
+                    <p className="font-avenir font-normal text-white/50 text-sm">{person.role}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column - Clients */}
+            <div
+              className={`transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
+                }`}
+            >
+              <p className="font-avenir font-normal text-white/60 text-sm mb-6">
+                {t('thanks.clientsText')}
+              </p>
+              <div className="flex flex-wrap gap-x-8 gap-y-2">
+                {clients.map((client, index) => (
+                  <span key={index} className="font-avenir font-bold italic text-[#00FF88]">
+                    {client}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -278,8 +278,8 @@ const createTargets = (
   height: number,
   isTouchDevice: boolean,
 ): FluidTargets => {
-  const simSize = getTargetSize(isTouchDevice ? 64 : 112, width, height);
-  const dyeSize = getTargetSize(isTouchDevice ? 256 : 560, width, height);
+  const simSize = getTargetSize(64, width, height);
+  const dyeSize = getTargetSize(isTouchDevice ? 256 : 512, width, height);
   const velocity = createDoubleTarget(simSize.width, simSize.height, THREE.LinearFilter);
   const dye = createDoubleTarget(dyeSize.width, dyeSize.height, THREE.LinearFilter);
   const pressure = createDoubleTarget(simSize.width, simSize.height, THREE.NearestFilter);
@@ -348,18 +348,18 @@ const FluidOceanBackground = () => {
 
     const splatMaterial = makeMaterial(splatShader, {
       uTarget: { value: null }, aspectRatio: { value: 1 }, point: { value: new THREE.Vector2() },
-      color: { value: new THREE.Vector3() }, radius: { value: 0.0018 },
+      color: { value: new THREE.Vector3() }, radius: { value: 0.0027 },
     });
     const advectionMaterial = makeMaterial(advectionShader, {
       uVelocity: { value: null }, uSource: { value: null }, texelSize: { value: new THREE.Vector2() },
-      dt: { value: 0.016 }, dissipation: { value: 0.1 },
+      dt: { value: 0.016 }, dissipation: { value: 0.32 },
     });
     const curlMaterial = makeMaterial(curlShader, {
       uVelocity: { value: null }, texelSize: { value: new THREE.Vector2() },
     });
     const vorticityMaterial = makeMaterial(vorticityShader, {
       uVelocity: { value: null }, uCurl: { value: null }, texelSize: { value: new THREE.Vector2() },
-      curl: { value: 24 }, dt: { value: 0.016 },
+      curl: { value: 4 }, dt: { value: 0.016 },
     });
     const divergenceMaterial = makeMaterial(divergenceShader, {
       uVelocity: { value: null }, texelSize: { value: new THREE.Vector2() },
@@ -463,12 +463,12 @@ const FluidOceanBackground = () => {
       advectionMaterial.uniforms.uSource.value = velocity.read.texture;
       advectionMaterial.uniforms.texelSize.value.copy(simTexelSize);
       advectionMaterial.uniforms.dt.value = dt;
-      advectionMaterial.uniforms.dissipation.value = 0.08;
+      advectionMaterial.uniforms.dissipation.value = 0.32;
       renderWith(advectionMaterial, velocity.write);
       velocity.swap();
       advectionMaterial.uniforms.uVelocity.value = velocity.read.texture;
       advectionMaterial.uniforms.uSource.value = dye.read.texture;
-      advectionMaterial.uniforms.dissipation.value = 0.22;
+      advectionMaterial.uniforms.dissipation.value = 0.9;
       renderWith(advectionMaterial, dye.write);
       dye.swap();
     };
@@ -535,7 +535,7 @@ const FluidOceanBackground = () => {
         x: point.x, y: point.y,
         dx: (pixelDx / Math.max(point.width, 1)) * 6400,
         dy: (-pixelDy / Math.max(point.height, 1)) * 6400,
-        color: colorAt(event.timeStamp), radius: 0.00155,
+        color: colorAt(event.timeStamp), radius: 0.0027,
       };
     };
 

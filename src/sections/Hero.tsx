@@ -186,7 +186,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             </span>
           </div>
 
-          {/* LADO DIREITO: Setinha (no início) -> substituída por Showreel (no 1º scroll), ambos sobem no 2º scroll */}
+          {/* LADO DIREITO: Showreel (entra no 1º scroll) e sobe no 2º scroll */}
           <div
             className="absolute bottom-[19vh] right-6 md:right-12 lg:right-20 flex flex-col items-end"
             style={{
@@ -194,24 +194,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             }}
           >
             <div className="relative flex flex-col items-end justify-center min-h-[32px]">
-              {/* Setinha (no canto direito desde o início; desaparece no 1º scroll) */}
-              {arrowOpacity > 0.001 && (
-                <div
-                  className="pointer-events-none absolute bottom-0 right-0 flex items-center justify-end"
-                  style={{
-                    opacity: arrowOpacity,
-                    transform: `scale(${mix(1, 0.85, showreelPhase)})`,
-                  }}
-                >
-                  <img
-                    src={arrowIcon}
-                    alt="Scroll down"
-                    className="h-10 w-auto md:h-12"
-                  />
-                </div>
-              )}
-
-              {/* Showreel (substitui a setinha no 1º scroll) */}
+              {/* Showreel (entra no 1º scroll) */}
               <div
                 className="relative flex flex-col items-end gap-4"
                 style={{

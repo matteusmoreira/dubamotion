@@ -1,17 +1,18 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { supabase, getProjectCategories, isVideoUrl } from '@/lib/supabase';
 import type { Trabalho, TrabalhoMedia } from '@/lib/supabase';
 import { ArrowLeft, Upload, X, Check, Loader2, Link as LinkIcon, Youtube, Image as ImageIcon } from 'lucide-react';
-
-
+import { FaVimeoV } from 'react-icons/fa';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
 
 type FormData = {
   titulo: string;
   titulo_en: string;
   descricao: string;
   descricao_en: string;
-  categoria: string;
+  categorias: string[];
+  creditos: string;
   ano: string;
   vimeo_url: string;
   ordem: number;
@@ -25,7 +26,8 @@ const defaultForm: FormData = {
   titulo_en: '',
   descricao: '',
   descricao_en: '',
-  categoria: 'mixed',
+  categorias: ['mixed'],
+  creditos: '',
   ano: '',
   vimeo_url: '',
   ordem: 0,
@@ -67,7 +69,8 @@ export default function EditarTrabalhoPage() {
               titulo_en: data.titulo_en || '',
               descricao: data.descricao || '',
               descricao_en: data.descricao_en || '',
-              categoria: data.categoria || 'mixed',
+              categorias: getProjectCategories(data.categoria),
+              creditos: data.creditos || '',
               ano: data.ano || '',
               vimeo_url: data.vimeo_url || '',
               ordem: data.ordem || 0,
@@ -82,6 +85,7 @@ export default function EditarTrabalhoPage() {
       setLoading(false);
     }
   }, [id, isNew]);
+
 
   // Converte arquivo de imagem local para WebP
   const convertToWebp = (file: File): Promise<File> => {
@@ -106,19 +110,32 @@ export default function EditarTrabalhoPage() {
     });
   };
 
-  // Upload de imagem para o Supabase Storage (Capa)
+  // Upload de imagem ou vídeo (WebM) para o Supabase Storage (Capa)
   const handleUpload = async (file: File) => {
-    if (!file.type.startsWith('image/')) return;
+    const isVideo = file.type.startsWith('video/') || isVideoUrl(file.name);
+    const isImage = file.type.startsWith('image/');
+    if (!isImage && !isVideo) return;
     setUploading(true);
     try {
-      const isGif = file.type === 'image/gif';
-      const fileToUpload = isGif ? file : await convertToWebp(file);
-      const extension = isGif ? 'gif' : 'webp';
+      let fileToUpload = file;
+      let extension = file.name.split('.').pop()?.toLowerCase() || 'webp';
+
+      if (isVideo) {
+        fileToUpload = file;
+      } else {
+        const isGif = file.type === 'image/gif';
+        fileToUpload = isGif ? file : await convertToWebp(file);
+        extension = isGif ? 'gif' : 'webp';
+      }
+
       const fileName = `${Date.now()}.${extension}`;
       
       const { data } = await supabase.storage
         .from('trabalhos-capas')
-        .upload(fileName, fileToUpload, { upsert: true });
+        .upload(fileName, fileToUpload, { 
+          upsert: true,
+          contentType: isVideo ? file.type || 'video/webm' : undefined 
+        });
 
       if (data) {
         const { data: { publicUrl } } = supabase.storage
@@ -128,24 +145,37 @@ export default function EditarTrabalhoPage() {
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao converter/enviar imagem da capa.');
+      alert('Erro ao converter/enviar imagem ou vídeo da capa.');
     }
     setUploading(false);
   };
 
-  // Upload de Media extra para a Galeria
+  // Upload de Media extra para a Galeria (Imagem ou Vídeo WebM)
   const handleUploadMedia = async (file: File) => {
-    if (!file.type.startsWith('image/')) return;
+    const isVideo = file.type.startsWith('video/') || isVideoUrl(file.name);
+    const isImage = file.type.startsWith('image/');
+    if (!isImage && !isVideo) return;
     setUploading(true);
     try {
-      const isGif = file.type === 'image/gif';
-      const fileToUpload = isGif ? file : await convertToWebp(file);
-      const extension = isGif ? 'gif' : 'webp';
+      let fileToUpload = file;
+      let extension = file.name.split('.').pop()?.toLowerCase() || 'webp';
+
+      if (isVideo) {
+        fileToUpload = file;
+      } else {
+        const isGif = file.type === 'image/gif';
+        fileToUpload = isGif ? file : await convertToWebp(file);
+        extension = isGif ? 'gif' : 'webp';
+      }
+
       const fileName = `${Date.now()}_media_${Math.random().toString(36).substring(7)}.${extension}`;
       
       const { data } = await supabase.storage
         .from('trabalhos-capas')
-        .upload(fileName, fileToUpload, { upsert: true });
+        .upload(fileName, fileToUpload, { 
+          upsert: true,
+          contentType: isVideo ? file.type || 'video/webm' : undefined 
+        });
 
       if (data) {
         const { data: { publicUrl } } = supabase.storage
@@ -153,14 +183,14 @@ export default function EditarTrabalhoPage() {
           .getPublicUrl(data.path);
         const newMedia: TrabalhoMedia = {
           id: Math.random().toString(36).substring(7),
-          tipo: 'image',
+          tipo: isVideo ? 'video' : 'image',
           url: publicUrl
         };
         setForm((f) => ({ ...f, midias: [...f.midias, newMedia] }));
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao converter/enviar imagem para a galeria.');
+      alert('Erro ao converter/enviar imagem ou vídeo para a galeria.');
     }
     setUploading(false);
   };
@@ -177,29 +207,45 @@ export default function EditarTrabalhoPage() {
     if (file) handleUpload(file);
   };
 
+  const toggleCategory = (catId: string) => {
+    setForm((f) => {
+      const exists = f.categorias.includes(catId);
+      const updated = exists
+        ? f.categorias.filter((id) => id !== catId)
+        : [...f.categorias, catId];
+      return { ...f, categorias: updated };
+    });
+  };
+
   // Salvar trabalho
   const handleSave = async () => {
     if (!form.titulo.trim()) return alert('O título é obrigatório.');
+    if (form.categorias.length === 0) return alert('Selecione pelo menos uma categoria.');
     setSaving(true);
 
+    const { categorias, ...restForm } = form;
+    const payload = {
+      ...restForm,
+      categoria: categorias.join(', '),
+    };
+
     if (isNew) {
-      const { error } = await supabase.from('trabalhos').insert({
-        ...form,
-        categoria: form.categoria as Trabalho['categoria'],
-      });
+      const { error } = await supabase.from('trabalhos').insert(payload);
       if (!error) {
         setSaving(false);
         navigate('/admin/trabalhos');
+      } else {
+        setSaving(false);
+        alert('Erro ao criar trabalho: ' + error.message);
       }
     } else {
-      const { error } = await supabase.from('trabalhos').update({
-        ...form,
-        categoria: form.categoria as Trabalho['categoria'],
-      }).eq('id', id);
+      const { error } = await supabase.from('trabalhos').update(payload).eq('id', id);
       setSaving(false);
       if (!error) {
         setSavedMsg(true);
         setTimeout(() => setSavedMsg(false), 2500);
+      } else {
+        alert('Erro ao salvar trabalho: ' + error.message);
       }
     }
   };
@@ -261,22 +307,59 @@ export default function EditarTrabalhoPage() {
             />
           </div>
 
-          {/* Categoria */}
+          {/* Categorias (Multi-select) */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-white/50 text-xs uppercase tracking-widest">
+                Categorias <span className="text-red-400">*</span>
+              </label>
+              <span className="text-[#00FF88]/70 text-xs">
+                Você pode escolher mais de uma
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2.5 p-3.5 bg-white/[0.03] border border-white/10 rounded-xl">
+              {categories.map((cat) => {
+                const isSelected = form.categorias.includes(cat.id);
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => toggleCategory(cat.id)}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all select-none cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#00FF88]/15 border border-[#00FF88] text-[#00FF88] shadow-[0_0_12px_rgba(0,255,136,0.15)]'
+                        : 'bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <div
+                      className={`w-4 h-4 rounded flex items-center justify-center border transition-all ${
+                        isSelected
+                          ? 'border-[#00FF88] bg-[#00FF88] text-black'
+                          : 'border-white/30 bg-transparent'
+                      }`}
+                    >
+                      {isSelected && <Check size={12} strokeWidth={3} />}
+                    </div>
+                    {cat.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+
+          {/* Créditos */}
           <div>
             <label className="block text-white/50 text-xs uppercase tracking-widest mb-2">
-              Categoria
+              Créditos / Ficha Técnica
             </label>
-            <select
-              value={form.categoria}
-              onChange={(e) => setForm((f) => ({ ...f, categoria: e.target.value }))}
-              className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#00FF88]/50 transition-all"
-            >
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id} className="bg-[#111] text-white">
-                  {cat.label}
-                </option>
-              ))}
-            </select>
+            <textarea
+              value={form.creditos}
+              onChange={(e) => setForm((f) => ({ ...f, creditos: e.target.value }))}
+              rows={3}
+              className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-[#00FF88]/50 transition-all resize-none"
+              placeholder="Ex: Direção: Nome, Motion: Nome..."
+            />
           </div>
 
           {/* Ano */}
@@ -311,32 +394,22 @@ export default function EditarTrabalhoPage() {
           </div>
 
           {/* Descrição PT */}
-          <div>
-            <label className="block text-white/50 text-xs uppercase tracking-widest mb-2">
-              Descrição (PT)
-            </label>
-            <textarea
-              value={form.descricao}
-              onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))}
-              rows={3}
-              className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-[#00FF88]/50 transition-all resize-none"
-              placeholder="Descrição curta do trabalho..."
-            />
-          </div>
+          <RichTextEditor
+            label="Descrição (PT)"
+            value={form.descricao}
+            onChange={(val) => setForm((f) => ({ ...f, descricao: val }))}
+            placeholder="Descrição curta do trabalho..."
+            rows={4}
+          />
 
           {/* Descrição EN */}
-          <div>
-            <label className="block text-white/50 text-xs uppercase tracking-widest mb-2">
-              Descrição (EN)
-            </label>
-            <textarea
-              value={form.descricao_en}
-              onChange={(e) => setForm((f) => ({ ...f, descricao_en: e.target.value }))}
-              rows={3}
-              className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-[#00FF88]/50 transition-all resize-none"
-              placeholder="Short description of the work..."
-            />
-          </div>
+          <RichTextEditor
+            label="Descrição (EN)"
+            value={form.descricao_en}
+            onChange={(val) => setForm((f) => ({ ...f, descricao_en: val }))}
+            placeholder="Short description of the work..."
+            rows={4}
+          />
 
           {/* Ordem */}
           <div>
@@ -359,16 +432,17 @@ export default function EditarTrabalhoPage() {
             <div className="flex flex-col sm:flex-row gap-2 mb-4">
               <input
                 type="text"
-                placeholder="https://youtube.com/watch?v=..."
+                placeholder="URL do vídeo (YouTube ou Vimeo)..."
                 className="flex-1 bg-white/[0.05] border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-white/30"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
                     const val = e.currentTarget.value.trim();
                     if (val) {
+                      const isVimeo = val.includes('vimeo.com');
                       setForm(f => ({
                         ...f,
-                        midias: [...f.midias, { id: Math.random().toString(36).substring(7), tipo: 'youtube', url: val }]
+                        midias: [...f.midias, { id: Math.random().toString(36).substring(7), tipo: isVimeo ? 'vimeo' : 'youtube', url: val }]
                       }));
                       e.currentTarget.value = '';
                     }
@@ -379,28 +453,48 @@ export default function EditarTrabalhoPage() {
                 type="button"
                 className="bg-[#00FF88]/20 text-[#00FF88] px-4 py-2 sm:py-0 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#00FF88]/30 transition-colors"
                 onClick={(e) => {
-                  const val = (e.currentTarget.previousElementSibling as HTMLInputElement).value.trim();
+                  const input = e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement;
+                  const val = input?.value.trim();
                   if (val) {
+                    const isVimeo = val.includes('vimeo.com');
                     setForm(f => ({
                       ...f,
-                      midias: [...f.midias, { id: Math.random().toString(36).substring(7), tipo: 'youtube', url: val }]
+                      midias: [...f.midias, { id: Math.random().toString(36).substring(7), tipo: isVimeo ? 'vimeo' : 'youtube', url: val }]
                     }));
-                    (e.currentTarget.previousElementSibling as HTMLInputElement).value = '';
+                    input.value = '';
                   }
                 }}
               >
                 <Youtube size={16} /> Adicionar YouTube
               </button>
+              <button
+                type="button"
+                className="bg-[#1ab7ea]/20 text-[#1ab7ea] px-4 py-2 sm:py-0 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#1ab7ea]/30 transition-colors"
+                onClick={(e) => {
+                  const input = e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement;
+                  const val = input?.value.trim();
+                  if (val) {
+                    const isYouTube = val.includes('youtube.com') || val.includes('youtu.be');
+                    setForm(f => ({
+                      ...f,
+                      midias: [...f.midias, { id: Math.random().toString(36).substring(7), tipo: isYouTube ? 'youtube' : 'vimeo', url: val }]
+                    }));
+                    input.value = '';
+                  }
+                }}
+              >
+                <FaVimeoV size={14} /> Adicionar Vimeo
+              </button>
             </div>
             
-            {/* Upload Imagens Multiple */}
+            {/* Upload Imagens/Vídeos Multiple */}
             <div
               onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
               onDrop={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 Array.from(e.dataTransfer.files).forEach(f => {
-                   if (f.type.startsWith('image/')) handleUploadMedia(f);
+                   if (f.type.startsWith('image/') || f.type.startsWith('video/') || isVideoUrl(f.name)) handleUploadMedia(f);
                 });
               }}
               className="border-2 border-dashed border-white/10 rounded-2xl p-6 text-center hover:bg-white/[0.02] transition-colors group cursor-pointer"
@@ -409,7 +503,7 @@ export default function EditarTrabalhoPage() {
               <input 
                 type="file" 
                 multiple 
-                accept="image/*" 
+                accept="image/*,video/webm,video/mp4,video/*,.webm" 
                 id="multi-image-upload" 
                 className="hidden" 
                 onChange={(e) => {
@@ -421,8 +515,8 @@ export default function EditarTrabalhoPage() {
               />
               <div className="flex flex-col items-center gap-2 text-white/50 group-hover:text-white transition-colors">
                 <ImageIcon size={24} className="mb-1" />
-                <span className="text-sm">Clique ou arraste várias imagens para a galeria</span>
-                <span className="text-xs text-white/30">Convertidas automaticamente para WebP</span>
+                <span className="text-sm">Clique ou arraste várias imagens ou vídeos (WebM) para a galeria</span>
+                <span className="text-xs text-white/30">Otimização de imagens • Suporte a WebM / MP4</span>
               </div>
             </div>
 
@@ -431,8 +525,15 @@ export default function EditarTrabalhoPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
                 {form.midias.map((m, idx) => (
                   <div key={m.id} className="relative aspect-video bg-white/5 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden group">
-                    {m.tipo === 'image' ? (
+                    {m.tipo === 'image' && !isVideoUrl(m.url) ? (
                       <img src={m.url} className="w-full h-full object-cover" />
+                    ) : (m.tipo === 'video' || isVideoUrl(m.url)) ? (
+                      <video src={m.url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                    ) : m.tipo === 'vimeo' ? (
+                      <div className="flex flex-col items-center gap-1.5 p-2 relative w-full h-full justify-center bg-black/40">
+                          <FaVimeoV size={22} className="text-[#1ab7ea]" />
+                          <span className="text-[10px] text-white/50 text-center px-1 break-all line-clamp-2">{m.url}</span>
+                      </div>
                     ) : (
                       <div className="flex flex-col items-center gap-1.5 p-2 relative w-full h-full justify-center bg-black/40">
                           <Youtube size={24} className="text-red-500" />
@@ -441,11 +542,11 @@ export default function EditarTrabalhoPage() {
                     )}
                     <button 
                       onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, midias: f.midias.filter(x => x.id !== m.id) })); }}
-                      className="absolute top-1 right-1 w-6 h-6 bg-black/80 hover:bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 w-6 h-6 bg-black/80 hover:bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
                     >
                       <X size={12} className="text-white" />
                     </button>
-                    <span className="absolute bottom-1 right-1 bg-black/80 px-1.5 py-0.5 rounded text-[10px] font-bold text-white">
+                    <span className="absolute bottom-1 right-1 bg-black/80 px-1.5 py-0.5 rounded text-[10px] font-bold text-white z-10">
                         {idx + 1}
                     </span>
                   </div>
@@ -461,16 +562,20 @@ export default function EditarTrabalhoPage() {
           {/* Upload de capa */}
           <div>
             <label className="block text-white/50 text-xs uppercase tracking-widest mb-2">
-              Imagem de Capa
+              Imagem / Vídeo de Capa
             </label>
 
             {/* Preview */}
             {form.capa_url && !uploading && (
               <div className="relative mb-3 aspect-square rounded-2xl overflow-hidden border border-white/10">
-                <img src={form.capa_url} alt="Capa" className="w-full h-full object-cover" />
+                {isVideoUrl(form.capa_url) ? (
+                  <video src={form.capa_url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                ) : (
+                  <img src={form.capa_url} alt="Capa" className="w-full h-full object-cover" />
+                )}
                 <button
                   onClick={() => setForm((f) => ({ ...f, capa_url: '' }))}
-                  className="absolute top-2 right-2 w-7 h-7 bg-black/70 hover:bg-red-500/70 rounded-full flex items-center justify-center text-white transition-all"
+                  className="absolute top-2 right-2 w-7 h-7 bg-black/70 hover:bg-red-500/70 rounded-full flex items-center justify-center text-white transition-all z-10"
                 >
                   <X size={12} />
                 </button>
@@ -498,8 +603,8 @@ export default function EditarTrabalhoPage() {
                 <>
                   <Upload size={24} className="text-white/30" />
                   <div className="text-center">
-                    <p className="text-white/50 text-sm">{form.capa_url ? 'Trocar imagem' : 'Arraste ou clique'}</p>
-                    <p className="text-white/20 text-xs mt-1">JPG, PNG, WebP, GIF</p>
+                    <p className="text-white/50 text-sm">{form.capa_url ? 'Trocar capa' : 'Arraste ou clique'}</p>
+                    <p className="text-white/20 text-xs mt-1">JPG, PNG, WebP, GIF, WebM</p>
                   </div>
                 </>
               )}
@@ -507,7 +612,7 @@ export default function EditarTrabalhoPage() {
             <input
               ref={fileRef}
               type="file"
-              accept="image/*"
+              accept="image/*,video/webm,video/mp4,video/*,.webm"
               className="hidden"
               onChange={handleFileChange}
             />

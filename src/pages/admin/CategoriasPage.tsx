@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, getProjectCategories } from '@/lib/supabase';
 import { Plus, Pencil, Trash2, Check, X, Loader2 } from 'lucide-react';
+
 
 type Categoria = {
   id: string;
   nome: string;
+  nome_en: string | null;
   slug: string;
   descricao: string | null;
   descricao_en: string | null;
   ordem: number;
 };
 
-const emptyForm = { nome: '', slug: '', descricao: '', descricao_en: '' };
+const emptyForm = { nome: '', nome_en: '', slug: '', descricao: '', descricao_en: '' };
 
 function slugify(text: string) {
   return text
@@ -55,6 +57,7 @@ export default function CategoriasPage() {
     setEditingId(cat.id);
     setForm({
       nome: cat.nome,
+      nome_en: cat.nome_en || '',
       slug: cat.slug,
       descricao: cat.descricao || '',
       descricao_en: cat.descricao_en || '',
@@ -73,15 +76,23 @@ export default function CategoriasPage() {
   };
 
   const handleSave = async () => {
-    if (!form.nome.trim()) return setError('O nome é obrigatório.');
+    if (!form.nome.trim()) return setError('O nome em português é obrigatório.');
     if (!form.slug.trim()) return setError('O slug é obrigatório.');
     setSaving(true);
     setError('');
 
+    const payload = {
+      nome: form.nome,
+      nome_en: form.nome_en || null,
+      slug: form.slug,
+      descricao: form.descricao || null,
+      descricao_en: form.descricao_en || null,
+    };
+
     if (editingId) {
       const { error: err } = await supabase
         .from('categorias')
-        .update({ nome: form.nome, slug: form.slug, descricao: form.descricao, descricao_en: form.descricao_en })
+        .update(payload)
         .eq('id', editingId);
       if (err) setError(err.message === 'duplicate key value violates unique constraint "categorias_slug_key"'
         ? 'Esse slug já está em uso por outra categoria.'
@@ -90,7 +101,7 @@ export default function CategoriasPage() {
       const maxOrdem = categorias.length ? Math.max(...categorias.map((c) => c.ordem)) + 1 : 1;
       const { error: err } = await supabase
         .from('categorias')
-        .insert({ ...form, ordem: maxOrdem });
+        .insert({ ...payload, ordem: maxOrdem });
       if (err) setError(err.message.includes('duplicate key')
         ? 'Esse slug já está em uso por outra categoria.'
         : err.message);
@@ -105,15 +116,16 @@ export default function CategoriasPage() {
 
   const handleDelete = async (cat: Categoria) => {
     // Verificar se tem trabalhos usando essa categoria
-    const { count } = await supabase
-      .from('trabalhos')
-      .select('id', { count: 'exact', head: true })
-      .eq('categoria', cat.slug);
+    const { data: jobs } = await supabase.from('trabalhos').select('id, categoria');
+    const count = jobs
+      ? jobs.filter((j) => getProjectCategories(j.categoria).includes(cat.slug)).length
+      : 0;
 
-    if (count && count > 0) {
+    if (count > 0) {
       alert(`Não é possível excluir "${cat.nome}" pois ela possui ${count} trabalho(s) vinculado(s). Remova ou mude a categoria dos trabalhos primeiro.`);
       return;
     }
+
 
     if (!confirm(`Excluir a categoria "${cat.nome}"? Esta ação não pode ser desfeita.`)) return;
     setDeleting(cat.id);
@@ -164,7 +176,7 @@ export default function CategoriasPage() {
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-white/40 text-xs uppercase tracking-widest mb-1.5">Nome *</label>
+              <label className="block text-white/40 text-xs uppercase tracking-widest mb-1.5">Nome / Título (PT) *</label>
               <input
                 type="text"
                 value={form.nome}
@@ -172,6 +184,17 @@ export default function CategoriasPage() {
                 className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-[#00FF88]/50 transition-all"
                 placeholder="Ex: Motion Graphics"
                 autoFocus
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/40 text-xs uppercase tracking-widest mb-1.5">Nome / Título em Inglês (EN)</label>
+              <input
+                type="text"
+                value={form.nome_en}
+                onChange={(e) => setForm((f) => ({ ...f, nome_en: e.target.value }))}
+                className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:border-[#00FF88]/50 transition-all"
+                placeholder="Ex: Motion Graphics"
               />
             </div>
 
@@ -278,6 +301,9 @@ export default function CategoriasPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3">
                   <span className="text-white font-semibold">{cat.nome}</span>
+                  {cat.nome_en && (
+                    <span className="text-white/40 text-xs">EN: {cat.nome_en}</span>
+                  )}
                   <span className="font-mono text-xs text-white/30 bg-white/5 px-2 py-0.5 rounded-md">{cat.slug}</span>
                 </div>
                 {cat.descricao && (

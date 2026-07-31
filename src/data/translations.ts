@@ -26,9 +26,13 @@ export const translations = {
         },
         about: {
             title: 'about',
-            p1: 'We are a Motion Design and post-production studio. We are a ',
-            highlight: 'brand that enhances narratives',
-            p2: 'Deepening ideas since 2021 and accumulating experience for more than a decade, we are a studio with extensive experience in Advertising and Digital. A trajectory that has passed through major market players, such as Meta and Google, and major advertising agencies like BETC and Africa Creative, participating in internationally recognized projects, including two Bronze Lions at Cannes Lions. We are ready to bring innovative solutions and give movement to your Narratives and Design.',
+            p1_1: 'We are a ',
+            p1_bold1: 'Motion Design and post-production studio.',
+            p1_2: 'We are a ',
+            p1_bold2: 'brand that enhances narratives.',
+            p2_1: 'Deepening ideas since 2021 and accumulating experience for more than a decade, we are a studio with extensive experience in Advertising and Digital. A trajectory that has passed through major market players, such as Meta and Google, and major advertising agencies like BETC and Africa Creative, participating in internationally recognized projects, including ',
+            p2_bold: 'two Bronze Lions at Cannes Lions.',
+            p2_2: ' We are ready to bring innovative solutions and give movement to your Narratives and Design.',
         },
         services: {
             title: 'what we do',
@@ -61,6 +65,7 @@ export const translations = {
             back: 'Back to Projects',
             client: 'Client',
             services: 'Services',
+            credits: 'Credits',
             year: 'Year',
             viewLive: 'View Live Project',
             cta: {
@@ -114,9 +119,13 @@ export const translations = {
         },
         about: {
             title: 'sobre',
-            p1: 'Somos um estúdio de Motion Design e pós produção. Somos uma ',
-            highlight: 'marca que potencializa narrativas',
-            p2: 'Aprofundando ideias desde 2021 e acumulando experiência há mais de uma década, somos um estúdio com ampla experiência em Publicidade e Digital. Uma trajetória que passou por grandes players do mercado, como Meta e Google, e grandes agências publicitárias como BETC e Africa Creative, participando de projetos reconhecidos internacionalmente, incluindo dois Leões de Bronze em Cannes Lions. Estamos prontos para trazer soluções inovadoras e dar movimento às suas Narrativas e Design.',
+            p1_1: 'Somos um ',
+            p1_bold1: 'estúdio de Motion Design e pós produção.',
+            p1_2: 'Somos uma ',
+            p1_bold2: 'marca que potencializa narrativas.',
+            p2_1: 'Aprofundando ideias desde 2021 e acumulando experiência há mais de uma década, somos um estúdio com ampla experiência em Publicidade e Digital. Uma trajetória que passou por grandes players do mercado, como Meta e Google, e grandes agências publicitárias como BETC e Africa Creative, participando de projetos reconhecidos internacionalmente, incluindo ',
+            p2_bold: 'dois Leões de Bronze em Cannes Lions.',
+            p2_2: ' Estamos prontos para trazer soluções inovadoras e dar movimento às suas Narrativas e Design.',
         },
         services: {
             title: 'O que nós fazemos',
@@ -149,6 +158,7 @@ export const translations = {
             back: 'Voltar para Projetos',
             client: 'Cliente',
             services: 'Serviços',
+            credits: 'Créditos',
             year: 'Ano',
             viewLive: 'Ver Projeto Online',
             cta: {

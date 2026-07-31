@@ -101,14 +101,22 @@ const About = ({ onNext, animateBackground = true }: AboutProps = {}) => {
             >
               <div className="space-y-6">
                 <p className="font-avenir text-white/80 text-lg leading-relaxed">
-                  {t('about.p1')}
+                  {t('about.p1_1')}
                   <span className="font-avenir font-bold text-white">
-                    {t('about.highlight')}
+                    {t('about.p1_bold1')}
                   </span>
-                  .
+                  <br />
+                  {t('about.p1_2')}
+                  <span className="font-avenir font-bold text-white">
+                    {t('about.p1_bold2')}
+                  </span>
                 </p>
                 <p className="font-avenir font-normal text-white/60 leading-relaxed">
-                  {t('about.p2')}
+                  {t('about.p2_1')}
+                  <span className="font-avenir font-bold text-white">
+                    {t('about.p2_bold')}
+                  </span>
+                  {t('about.p2_2')}
                 </p>
               </div>
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { supabase, getProjectCategories, isVideoUrl } from '@/lib/supabase';
 import type { Trabalho } from '@/lib/supabase';
 import { Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
 
@@ -28,12 +28,15 @@ export default function TrabalhosPage() {
 
   const fetchTrabalhos = async () => {
     setLoading(true);
-    let query = supabase.from('trabalhos').select('*').order('ordem').order('created_at', { ascending: false });
-    if (categoriaFiltro) query = query.eq('categoria', categoriaFiltro);
-    const { data } = await query;
-    setTrabalhos(data || []);
+    const { data } = await supabase.from('trabalhos').select('*').order('ordem').order('created_at', { ascending: false });
+    let list = data || [];
+    if (categoriaFiltro) {
+      list = list.filter((t) => getProjectCategories(t.categoria).includes(categoriaFiltro));
+    }
+    setTrabalhos(list);
     setLoading(false);
   };
+
 
   useEffect(() => {
     fetchCategorias();
@@ -123,11 +126,22 @@ export default function TrabalhosPage() {
               {/* Imagem de capa */}
               <div className="aspect-square relative bg-white/5">
                 {trabalho.capa_url ? (
-                  <img
-                    src={trabalho.capa_url}
-                    alt={trabalho.titulo}
-                    className="w-full h-full object-cover"
-                  />
+                  isVideoUrl(trabalho.capa_url) ? (
+                    <video
+                      src={trabalho.capa_url}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={trabalho.capa_url}
+                      alt={trabalho.titulo}
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-white/20 text-xs">
                     Sem capa
@@ -148,8 +162,17 @@ export default function TrabalhosPage() {
               {/* Info */}
               <div className="p-4">
                 <h3 className="text-white font-semibold text-sm truncate mb-1">{trabalho.titulo}</h3>
-                <p className="text-white/30 text-xs capitalize">{trabalho.categoria}</p>
+                {(() => {
+                  const catSlugs = getProjectCategories(trabalho.categoria);
+                  const catNames = catSlugs.map(s => categories.find(c => c.id === s)?.label || s).join(', ');
+                  return (
+                    <p className="text-white/30 text-xs truncate" title={catNames}>
+                      {catNames || 'Sem categoria'}
+                    </p>
+                  );
+                })()}
               </div>
+
 
               {/* Actions */}
               <div className="absolute inset-x-0 bottom-0 p-3 flex items-center justify-between gap-2 bg-gradient-to-t from-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">

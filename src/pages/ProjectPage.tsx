@@ -2,19 +2,25 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ExternalLink, Loader2 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import type { Trabalho } from '../lib/supabase';
+import { supabase, getProjectCategories, isVideoUrl } from '../lib/supabase';
+import type { Trabalho, Categoria } from '../lib/supabase';
 import { useEffect, useState } from 'react';
+import { RichText } from '../components/RichText';
 
 const ProjectPage = () => {
     const { t, language } = useLanguage();
     const { id } = useParams();
     const navigate = useNavigate();
     const [project, setProject] = useState<Trabalho | null>(null);
+    const [categories, setCategories] = useState<Categoria[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        supabase.from('categorias').select('*').then(({ data }) => {
+            if (data) setCategories(data);
+        });
+
         if (id) {
             supabase
                 .from('trabalhos')
@@ -27,6 +33,7 @@ const ProjectPage = () => {
                 });
         }
     }, [id]);
+
 
     if (loading) {
         return (
@@ -52,6 +59,13 @@ const ProjectPage = () => {
         );
     }
 
+    const catSlugs = getProjectCategories(project.categoria);
+    const catNames = catSlugs.map((s) => {
+        const c = categories.find((cat) => cat.slug === s);
+        if (!c) return s;
+        return language === 'en' ? (c.nome_en || c.nome) : c.nome;
+    });
+
     return (
         <div className="min-h-screen bg-black text-white selection:bg-[#00FF88] selection:text-black">
             {/* Navigation */}
@@ -74,11 +88,22 @@ const ProjectPage = () => {
                 className="relative h-screen w-full flex items-center justify-center overflow-hidden"
             >
                 <div className="absolute inset-0 w-full h-full">
-                    <img
-                        src={project.capa_url || ''}
-                        alt={project.titulo}
-                        className="w-full h-full object-cover opacity-60 scale-105"
-                    />
+                    {isVideoUrl(project.capa_url) ? (
+                        <video
+                            src={project.capa_url || ''}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover opacity-60 scale-105"
+                        />
+                    ) : (
+                        <img
+                            src={project.capa_url || ''}
+                            alt={project.titulo}
+                            className="w-full h-full object-cover opacity-60 scale-105"
+                        />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 </div>
 
@@ -89,14 +114,15 @@ const ProjectPage = () => {
                         transition={{ delay: 0.2, duration: 0.8 }}
                     >
                         <span className="inline-block px-4 py-2 border border-[#00FF88]/30 rounded-full text-[#00FF88] text-sm tracking-widest uppercase mb-6 backdrop-blur-sm bg-black/20">
-                            {project.categoria}
+                            {catNames.join(' • ')}
                         </span>
                         <h1 className="text-6xl lg:text-9xl font-bold mb-6 tracking-tight">
                             {language === 'en' ? (project.titulo_en || project.titulo) : project.titulo}
                         </h1>
-                        <p className="text-xl lg:text-3xl text-white/80 max-w-2xl font-light leading-relaxed">
-                            {language === 'en' ? (project.descricao_en || project.descricao) : project.descricao}
-                        </p>
+                        <RichText
+                            content={language === 'en' ? (project.descricao_en || project.descricao) : project.descricao}
+                            className="text-xl lg:text-3xl text-white/80 max-w-2xl font-light leading-relaxed mb-4"
+                        />
                     </motion.div>
                 </div>
 
@@ -139,9 +165,26 @@ const ProjectPage = () => {
 
                             <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">{t('project.services')}</h3>
                             <ul className="space-y-2 text-lg text-white/80 pl-6 border-l-2 border-white/10">
-                                <li className="capitalize">{project.categoria}</li>
+                                {catNames.map((name) => (
+                                    <li key={name} className="capitalize">{name}</li>
+                                ))}
                             </ul>
                         </motion.div>
+
+
+                        {project.creditos && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6, delay: 0.15 }}
+                            >
+                                <h3 className="text-sm text-gray-400 uppercase tracking-widest mb-4">{t('project.credits')}</h3>
+                                <div className="text-base text-white/80 pl-6 border-l-2 border-white/10 whitespace-pre-line leading-relaxed font-light">
+                                    {project.creditos}
+                                </div>
+                            </motion.div>
+                        )}
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -181,16 +224,38 @@ const ProjectPage = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <p className="text-xl lg:text-2xl leading-relaxed text-white/80 mb-12">
-                                {language === 'en' ? (project.descricao_en || project.descricao) : project.descricao}
-                            </p>
+                            <RichText
+                                content={language === 'en' ? (project.descricao_en || project.descricao) : project.descricao}
+                                className="text-xl lg:text-2xl leading-relaxed text-white/80 mb-12"
+                            />
                         </motion.div>
 
                         {/* Project Gallery from midias */}
                         {project.midias && project.midias.length > 0 && (
                             <div className="grid grid-cols-1 gap-12">
                                 {project.midias.map((media, index) => {
-                                    if (media.tipo === 'image') {
+                                    if (media.tipo === 'video' || isVideoUrl(media.url)) {
+                                        return (
+                                            <motion.div
+                                                key={media.id || index}
+                                                initial={{ opacity: 0, y: 30 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true, margin: "-100px" }}
+                                                transition={{ duration: 0.8 }}
+                                                className="w-full rounded-2xl overflow-hidden bg-black/50 border border-white/10 flex justify-center"
+                                            >
+                                                <video
+                                                    src={media.url}
+                                                    controls
+                                                    autoPlay
+                                                    loop
+                                                    muted
+                                                    playsInline
+                                                    className="w-full h-auto block max-h-[85vh]"
+                                                />
+                                            </motion.div>
+                                        );
+                                    } else if (media.tipo === 'image') {
                                         return (
                                             <motion.div
                                                 key={media.id || index}
@@ -228,6 +293,37 @@ const ProjectPage = () => {
                                                     title={`YouTube video ${index + 1}`}
                                                     frameBorder="0"
                                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                />
+                                            </motion.div>
+                                        );
+                                    } else if (media.tipo === 'vimeo') {
+                                        const getVimeoEmbedUrl = (url: string) => {
+                                            if (url.includes('player.vimeo.com/video/')) return url;
+                                            const match = url.match(/vimeo\.com\/(?:.*\/)?(\d+)(?:\/([a-zA-Z0-9]+))?/);
+                                            if (match && match[1]) {
+                                                const videoId = match[1];
+                                                const hash = match[2] ? `?h=${match[2]}` : '';
+                                                return `https://player.vimeo.com/video/${videoId}${hash}`;
+                                            }
+                                            const idMatch = url.match(/(\d{6,})/);
+                                            return idMatch ? `https://player.vimeo.com/video/${idMatch[1]}` : url;
+                                        };
+                                        return (
+                                            <motion.div
+                                                key={media.id || index}
+                                                initial={{ opacity: 0, y: 30 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true, margin: "-100px" }}
+                                                transition={{ duration: 0.8 }}
+                                                className="w-full aspect-video rounded-2xl overflow-hidden bg-black/50 border border-white/10"
+                                            >
+                                                <iframe
+                                                    src={getVimeoEmbedUrl(media.url)}
+                                                    className="w-full h-full"
+                                                    title={`Vimeo video ${index + 1}`}
+                                                    frameBorder="0"
+                                                    allow="autoplay; fullscreen; picture-in-picture"
                                                     allowFullScreen
                                                 />
                                             </motion.div>

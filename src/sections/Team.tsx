@@ -54,8 +54,6 @@ const Team = ({ onNext, onPrev, animateBackground = true }: TeamProps = {}) => {
     return () => observer.disconnect();
   }, []);
 
-
-
   return (
     <section
       id="team"
@@ -63,16 +61,16 @@ const Team = ({ onNext, onPrev, animateBackground = true }: TeamProps = {}) => {
       className="relative w-full bg-black py-24"
     >
       {/* Gradient Header */}
-      {/* Gradient Header */}
-      <div className="relative h-32 mb-16 overflow-hidden w-full">
+      <div className="relative h-36 mb-16 overflow-hidden w-full">
         <div className="absolute inset-0 z-0 w-full h-full">
           <WarpTitleBackground active={isVisible && animateBackground} />
           <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
         </div>
         <div className="relative z-10 flex items-center justify-center h-full">
           <h2
-            className={`font-foco font-bold text-5xl lg:text-7xl green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-              }`}
+            className={`font-foco font-bold text-5xl lg:text-7xl green-gradient-title pb-2 transition-all duration-1000 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
           >
             {t('team.title')}
           </h2>
@@ -82,7 +80,7 @@ const Team = ({ onNext, onPrev, animateBackground = true }: TeamProps = {}) => {
       {/* Carousel */}
       <div className="max-w-6xl mx-auto px-8 lg:px-16">
         <div className="relative">
-          {/* Navigation Arrows (for Carousel integration) */}
+          {/* Navigation Arrows */}
           <button
             onClick={() => {
               if (onPrev) {
@@ -94,7 +92,7 @@ const Team = ({ onNext, onPrev, animateBackground = true }: TeamProps = {}) => {
                 }
               }
             }}
-            className={`absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 lg:-translate-x-16 z-10 text-white/50 hover:text-[#00FF88] transition-colors ${onPrev ? 'opacity-100' : 'opacity-100'}`}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 lg:-translate-x-16 z-10 text-white/50 hover:text-[#00FF88] transition-colors"
             aria-label="Previous section"
           >
             <ChevronLeft size={40} />
@@ -118,8 +116,9 @@ const Team = ({ onNext, onPrev, animateBackground = true }: TeamProps = {}) => {
 
           {/* Team Members Grid */}
           <div
-            className={`grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-              }`}
+            className={`grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto transition-all duration-1000 delay-200 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
           >
             {teamMembers.map((member, index) => (
               <div
@@ -161,8 +160,6 @@ const Team = ({ onNext, onPrev, animateBackground = true }: TeamProps = {}) => {
               </div>
             ))}
           </div>
-
-        {/* Dots Indicator removed since there are only two members shown side by side */}
         </div>
       </div>
     </section>

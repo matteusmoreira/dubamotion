@@ -6,6 +6,7 @@ import { supabase, getProjectCategories, isVideoUrl } from '../lib/supabase';
 import type { Trabalho, Categoria } from '../lib/supabase';
 import { useEffect, useState } from 'react';
 import { RichText } from '../components/RichText';
+import Footer from '../sections/Footer';
 
 const ProjectPage = () => {
     const { t, language } = useLanguage();
@@ -337,15 +338,8 @@ const ProjectPage = () => {
                 </div>
             </section>
 
-            {/* Next Project Teaser (Simple Implementation) */}
-            <section className="py-24 border-t border-white/10 mt-12 bg-zinc-900/30">
-                <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center">
-                    <h2 className="text-3xl font-bold mb-8">{t('project.cta.title')}</h2>
-                    <button onClick={() => navigate('/#contact')} className="text-[#00FF88] text-xl hover:text-white transition-colors underline decoration-2 underline-offset-8">
-                        {t('project.cta.button')}
-                    </button>
-                </div>
-            </section>
+            {/* Footer with Project CTA */}
+            <Footer showCta />
         </div>
     );
 };

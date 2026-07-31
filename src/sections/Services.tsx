@@ -42,6 +42,8 @@ const Services = () => {
     'services.post.ai',
     'services.post.track',
     'services.post.comp',
+    'services.post.mix',
+    'services.post.finishing',
   ];
 
   return (

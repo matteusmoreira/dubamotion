@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Mail, Instagram, Twitter, Linkedin, ChevronRight } from 'lucide-react';
+import { Mail, Instagram, Linkedin, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import WarpTitleBackground from '../components/WarpTitleBackground';
 import WhatsAppIcon from '../components/WhatsAppIcon';
@@ -35,7 +35,6 @@ const About = ({ onNext, animateBackground = true }: AboutProps = {}) => {
   const contactInfo = [
     { icon: Mail, text: 'contato@dubamotion.com.br', href: 'mailto:contato@dubamotion.com.br' },
     { icon: Instagram, text: '@dubamotion', href: 'https://instagram.com/dubamotion' },
-    { icon: Twitter, text: '/dubamotion', href: 'https://twitter.com/dubamotion' },
     { icon: Linkedin, text: '/dubamotion', href: 'https://linkedin.com/company/dubamotion' },
     { icon: WhatsAppIcon, text: '55 (11) 9.8754-0457', href: 'https://wa.me/5511987540457' },
   ];
@@ -49,7 +48,7 @@ const About = ({ onNext, animateBackground = true }: AboutProps = {}) => {
       {/* Content Wrapper */}
       <div className="relative z-10">
         {/* Header */}
-        <div className="relative h-32 mb-16 flex items-center justify-center overflow-hidden w-full">
+        <div className="relative h-36 mb-16 flex items-center justify-center overflow-hidden w-full">
           {/* Warp Background for Title */}
           <div className="absolute inset-0 z-0 w-full h-full">
             <WarpTitleBackground active={isVisible && animateBackground} />
@@ -58,7 +57,7 @@ const About = ({ onNext, animateBackground = true }: AboutProps = {}) => {
           </div>
 
           <h2
-            className={`relative z-10 font-foco font-bold text-5xl text-white transition-all duration-1000 lg:text-7xl ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`relative z-10 font-foco font-bold text-5xl text-white pb-2 transition-all duration-1000 lg:text-7xl ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
             {t('about.title')}
@@ -96,10 +95,10 @@ const About = ({ onNext, animateBackground = true }: AboutProps = {}) => {
 
             {/* Right Column - Description */}
             <div
-              className={`transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
+              className={`transition-all duration-1000 delay-400 flex items-center gap-6 lg:gap-8 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
                 }`}
             >
-              <div className="space-y-6">
+              <div className="space-y-6 flex-1">
                 <p className="font-avenir text-white/80 text-lg leading-relaxed">
                   {t('about.p1_1')}
                   <span className="font-avenir font-bold text-white">
@@ -120,25 +119,23 @@ const About = ({ onNext, animateBackground = true }: AboutProps = {}) => {
                 </p>
               </div>
 
-              {/* Navigation */}
-              <div className="mt-12 flex justify-end items-center">
-                <button
-                  onClick={() => {
-                    if (onNext) {
-                      onNext();
-                    } else {
-                      const teamSection = document.getElementById('team');
-                      if (teamSection) {
-                        teamSection.scrollIntoView({ behavior: 'smooth' });
-                      }
+              {/* Navigation Arrow Beside Text */}
+              <button
+                onClick={() => {
+                  if (onNext) {
+                    onNext();
+                  } else {
+                    const teamSection = document.getElementById('team');
+                    if (teamSection) {
+                      teamSection.scrollIntoView({ behavior: 'smooth' });
                     }
-                  }}
-                  className="text-white/50 hover:text-[#00FF88] transition-colors"
-                  aria-label="Next section"
-                >
-                  <ChevronRight size={32} />
-                </button>
-              </div>
+                  }
+                }}
+                className="shrink-0 text-white/50 hover:text-[#00FF88] transition-colors p-2 hover:scale-110 transform"
+                aria-label="Next section"
+              >
+                <ChevronRight size={40} />
+              </button>
             </div>
           </div>
         </div>

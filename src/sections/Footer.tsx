@@ -1,20 +1,31 @@
-import { Mail, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Mail, Instagram, Linkedin } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 
-const Footer = () => {
+interface FooterProps {
+  showCta?: boolean;
+}
+
+const Footer = ({ showCta }: FooterProps) => {
   const { t } = useLanguage();
   const contactInfo = [
     { icon: Mail, text: 'contato@dubamotion.com.br', href: 'mailto:contato@dubamotion.com.br' },
     { icon: Instagram, text: '@dubamotion', href: 'https://instagram.com/dubamotion' },
-    { icon: Twitter, text: '/dubamotion', href: 'https://twitter.com/dubamotion' },
     { icon: Linkedin, text: '/dubamotion', href: 'https://linkedin.com/company/dubamotion' },
     { icon: WhatsAppIcon, text: '55 (11) 9.8754-0457', href: 'https://wa.me/5511987540457' },
   ];
 
   return (
-    <footer id="contact" className="w-full bg-black py-16 px-8 lg:px-16">
+    <footer id="contact" className="w-full bg-black py-16 px-8 lg:px-16 border-t border-white/10">
       <div className="max-w-6xl mx-auto">
+        {showCta && (
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-5xl font-bold text-white tracking-tight">
+              {t('project.cta.title')}
+            </h2>
+          </div>
+        )}
+
         {/* Contact Info */}
         <div className="flex flex-col items-center gap-4">
           {contactInfo.map((item, index) => (

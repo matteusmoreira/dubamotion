@@ -34,7 +34,6 @@ const Thanks = ({ onPrev, animateBackground = true }: ThanksProps = {}) => {
   const collaborators = [
     { name: 'Amanda Lucatti', role: t('thanks.roles.amanda') },
     { name: 'André Lobato e Equipe Alfred', role: t('thanks.roles.alfred') },
-    { name: 'Dalmo Azevedo', role: t('thanks.roles.dalmo') },
     { name: 'Higor Hatano', role: t('thanks.roles.higor') },
     { name: 'Leonardo Martineli', role: t('thanks.roles.leonardo') },
     { name: 'Victor Santos', role: t('thanks.roles.victor') },
@@ -62,14 +61,14 @@ const Thanks = ({ onPrev, animateBackground = true }: ThanksProps = {}) => {
       className="relative w-full bg-black py-24"
     >
       {/* Gradient Header */}
-      <div className="relative h-32 mb-16 overflow-hidden w-full">
+      <div className="relative h-36 mb-16 overflow-hidden w-full">
         <div className="absolute inset-0 z-0 w-full h-full">
           <WarpTitleBackground active={isVisible && animateBackground} />
           <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
         </div>
         <div className="relative z-10 flex items-center justify-center h-full">
           <h2
-            className={`font-foco font-bold text-5xl lg:text-7xl green-gradient-title transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`font-foco font-bold text-5xl lg:text-7xl green-gradient-title pb-2 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
           >
             {t('thanks.title')}

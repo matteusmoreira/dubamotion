@@ -233,7 +233,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             }}
           >
             <img
-              src="/images/logo-oficial-final-duba.webp"
+              src="/images/DUBAMOTION-LOGOTIPO.svg"
               alt=""
               className="block h-auto max-w-none select-none object-contain [filter:brightness(0)]"
               style={{

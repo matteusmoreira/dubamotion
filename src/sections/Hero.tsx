@@ -1,10 +1,99 @@
-import { lazy, Suspense, useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getShowreelVideoId } from '../lib/showreel';
-import octopusHeroImage from '../../polvo/0112.webp';
 import arrowIcon from '../../seta/Lootie_Seta-p-baixo_loop.svg';
 
 const FluidOceanBackground = lazy(() => import('../components/FluidOceanBackground'));
+
+const TOTAL_OCTOPUS_FRAMES = 78;
+
+const OctopusFrameCanvas = ({ progress }: { progress: number }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const currentProgressRef = useRef(progress);
+  const smoothProgressRef = useRef(progress);
+  const activeFrameIndexRef = useRef(-1);
+
+  // Keep target progress up to date
+  useEffect(() => {
+    currentProgressRef.current = progress;
+  }, [progress]);
+
+  // Preload all clean WebP frames (with transparent background)
+  useEffect(() => {
+    const images: HTMLImageElement[] = [];
+    for (let i = 0; i < TOTAL_OCTOPUS_FRAMES; i++) {
+      const img = new Image();
+      const numStr = String(i).padStart(3, '0');
+      img.src = `/polvo-clean-frames/frame_${numStr}.webp`;
+      images.push(img);
+    }
+    imagesRef.current = images;
+  }, []);
+
+  // Smooth lerp loop for frame scrub rendering
+  useEffect(() => {
+    let animId: number;
+
+    const render = () => {
+      const target = currentProgressRef.current;
+      const diff = target - smoothProgressRef.current;
+      if (Math.abs(diff) > 0.00005) {
+        smoothProgressRef.current += diff * 0.12;
+      } else {
+        smoothProgressRef.current = target;
+      }
+
+      const p = clamp(smoothProgressRef.current);
+      // Map scroll progress 0 -> 1 to 78 octopus frames with proper presence and exit window
+      let frameIndex = 0;
+      if (p < 0.05) {
+        frameIndex = 0;
+      } else if (p <= 0.25) {
+        const ratio = (p - 0.05) / 0.20;
+        frameIndex = Math.floor(ratio * 15);
+      } else if (p <= 0.82) {
+        const ratio = (p - 0.25) / 0.57;
+        frameIndex = Math.floor(15 + ratio * (62 - 15));
+      } else {
+        const ratio = Math.min((p - 0.82) / 0.16, 1);
+        frameIndex = Math.floor(62 + ratio * (77 - 62));
+      }
+      frameIndex = Math.min(TOTAL_OCTOPUS_FRAMES - 1, Math.max(0, frameIndex));
+
+      if (frameIndex !== activeFrameIndexRef.current) {
+        activeFrameIndexRef.current = frameIndex;
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            const img = imagesRef.current[frameIndex];
+            if (img && img.complete && img.naturalWidth > 0) {
+              if (canvas.width !== img.naturalWidth || canvas.height !== img.naturalHeight) {
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+              }
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0);
+            }
+          }
+        }
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="h-auto w-full object-contain md:mix-blend-screen"
+    />
+  );
+};
 
 
 interface HeroProps {
@@ -55,16 +144,15 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const labelExitPhase = easeInOutCubic(segment(progress, 0.34, 0.46));
   const dockPhase = easeInOutCubic(segment(progress, 0.16, 0.36));
   const handoffPhase = easeInOutCubic(segment(progress, 0.24, 0.4));
-  const statementPhase = easeOutCubic(segment(progress, 0.28, 0.48));
-  const octopusRevealPhase = easeOutCubic(segment(progress, 0.32, 0.54));
-  const octopusDriftPhase = easeInOutCubic(segment(progress, 0.68, 0.84));
-  const deepeningPhase = easeOutCubic(segment(progress, 0.72, 0.9));
-  const exitPhase = easeInOutCubic(segment(progress, 0.88, 1));
+  const statementPhase = easeOutCubic(segment(progress, 0.22, 0.42));
+  const octopusRevealPhase = easeOutCubic(segment(progress, 0.10, 0.32));
+  const octopusDriftPhase = easeInOutCubic(segment(progress, 0.32, 0.82));
+  const deepeningPhase = easeOutCubic(segment(progress, 0.45, 0.65));
+  const exitPhase = easeInOutCubic(segment(progress, 0.82, 0.98));
 
   const baseOverlayOpacity = mix(0.04, 0.18, deepeningPhase);
   const atmosphereOpacity = mix(0.12, 0.74, statementPhase);
   const vignetteOpacity = mix(0.12, 0.48, deepeningPhase);
-  
   // Dubamotion está presente desde o início do site e sai na labelExitPhase
   const dubamotionOpacity = 1 * (1 - labelExitPhase);
 
@@ -84,10 +172,9 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
   const markTranslateY = mix(markRestTranslateY, -35, dockPhase);
   const markOpacity = mix(1, 0, handoffPhase);
 
-  const octopusOpacity = octopusRevealPhase * (1 - exitPhase * 0.18);
-  const octopusScale = mix(0.9, 1.08, octopusRevealPhase)
-    + mix(0, 0.18, octopusDriftPhase)
-    + mix(0, 0.4, deepeningPhase)
+  const octopusOpacity = octopusRevealPhase * (1 - exitPhase);
+  const octopusScale = mix(0.82, 1.05, octopusRevealPhase)
+    + mix(0, 0.06, octopusDriftPhase)
     - mix(0, 0.08, exitPhase);
   const octopusOffsetX = isMobile ? 0 : mix(0, -20, octopusDriftPhase);
   const octopusOffsetY = mix(72, 12, octopusRevealPhase)
@@ -157,19 +244,14 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
         </div>
 
         <div
-          className="hero-octopus-glow pointer-events-none absolute left-1/2 top-[60%] z-50 w-[104vw] max-w-[1580px] sm:w-[80vw] lg:w-[56vw]"
+          className="hero-octopus-glow pointer-events-none absolute left-1/2 top-[50%] z-50 w-[96vw] max-w-[1550px] sm:w-[84vw] lg:w-[70vw] xl:w-[62vw]"
           style={{
             opacity: octopusOpacity,
             transform: `translate3d(calc(-50% + ${octopusOffsetX}vw), calc(-50% + ${octopusOffsetY}vh), 0) scale(${octopusScale})`,
+            transition: 'opacity 0.25s ease-out',
           }}
         >
-          <img
-            src={octopusHeroImage}
-            alt=""
-            decoding="async"
-            fetchPriority="high"
-            className="h-auto w-full object-contain md:mix-blend-screen"
-          />
+          <OctopusFrameCanvas progress={progress} />
         </div>
 
         <div className="pointer-events-none absolute inset-0 z-40">
@@ -243,7 +325,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             className="absolute left-6 top-[30%] md:left-12 lg:left-20"
             style={{
               opacity: statementOpacity,
-              transform: `translate3d(${mix(-44, 0, statementPhase)}px, ${mix(32, 0, statementPhase)}px, 0)`,
+              transform: `translate3d(${mix(-44, 0, statementPhase)}px, calc(${mix(32, 0, statementPhase)}px - ${mix(0, 40, exitPhase)}px), 0)`,
             }}
           >
             <h1
@@ -259,7 +341,7 @@ const Hero = ({ onShowreelClick, scrollProgress = 0 }: HeroProps) => {
             className="absolute bottom-[18vh] right-6 text-right md:right-12 lg:right-20"
             style={{
               opacity: deepeningOpacity,
-              transform: `translate3d(${mix(18, 0, deepeningPhase)}px, ${mix(22, 0, deepeningPhase)}px, 0)`,
+              transform: `translate3d(${mix(18, 0, deepeningPhase)}px, calc(${mix(22, 0, deepeningPhase)}px - ${mix(0, 40, exitPhase)}px), 0)`,
             }}
           >
             <h2 className="hero-copy-font max-w-[8.5ch] text-[1.28rem] leading-[0.92] text-white md:text-[2.2rem] xl:text-[2.9rem]">
